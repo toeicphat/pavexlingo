@@ -1,10 +1,10 @@
 import { VocabularyPart, VocabularyTest, VocabItem } from '../types';
 import { listeningPart1Vocabulary } from './vocabulary/listeningPart1Vocabulary';
 import { listeningComprehensiveVocabulary } from './vocabulary/listeningComprehensiveVocabulary';
-import { readingPart7Vocabulary } from './vocabulary/readingPart7Vocabulary';
-import { readingComprehensiveVocabulary } from './vocabulary/readingVoca';
 import { listening2026Vocabulary } from './vocabulary/listening2026Vocabulary';
 import { listeningBasicVocabulary } from './vocabulary/listeningBasicVocabulary';
+import { readingPart7Vocabulary } from './vocabulary/readingPart7Vocabulary';
+import { readingComprehensiveVocabulary } from './vocabulary/readingVoca';
 import { reading2026Vocabulary } from './vocabulary/reading2026Vocabulary';
 import { readingPart7IntenseVocabularyData } from './vocabulary/readingPart7IntenseVocabulary';
 
@@ -15,10 +15,10 @@ export const vocabularyData: VocabularyPart[] = [
     listeningBasicVocabulary,
     listeningComprehensiveVocabulary,
     listening2026Vocabulary,
-    reading2026Vocabulary,
     readingPart7Vocabulary,
     readingComprehensiveVocabulary,
-    readingPart7IntenseVocabularyData
+    reading2026Vocabulary,
+    readingPart7IntenseVocabularyData,
 ];
 
 export const getVocabularyPart = (partId: number): VocabularyPart | null => {

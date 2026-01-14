@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { SectionVocabIcon, SectionDictationIcon, SectionGrammarIcon, TrophyIcon, SparklesIcon } from './icons';
+import { SectionVocabIcon, SectionDictationIcon, SectionGrammarIcon, MoneyEmojiIcon, SparklesIcon, TargetFillIcon } from './icons';
 
 interface PracticeHubProps {
   onNavigateToVocabulary: () => void;
@@ -50,8 +49,12 @@ const PracticeHub: React.FC<PracticeHubProps> = ({
 }) => {
   return (
     <div className="container mx-auto px-4 py-12">
-      <div className="max-w-4xl mx-auto text-center mb-12">
-        <h2 className="text-4xl font-extrabold text-slate-900 dark:text-white sm:text-5xl">TOEIC không khó, học CHẮC bao ĐẬU</h2>
+      <div className="max-w-4xl mx-auto text-center mb-12 flex flex-col items-center">
+        <div className="flex items-center gap-4 mb-4 animate-bling">
+          <TargetFillIcon className="h-20 w-20" />
+          <span className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-blue-500 to-blue-700 select-none">990</span>
+        </div>
+        <h2 className="text-4xl font-extrabold text-slate-900 dark:text-white sm:text-5xl tracking-tight animate-shake">TOEIC không khó, học CHẮC bao ĐẬU</h2>
         <p className="mt-4 text-lg text-red-600 font-bold">
           Vì đây là sản phẩm đang phát triển. Nếu có sai sót, xin vui lòng nhắn tin cho thầy Phát qua Facebook cá nhân ở cuối trang.
         </p>
@@ -90,7 +93,7 @@ const PracticeHub: React.FC<PracticeHubProps> = ({
                     <strong>Lưu ý:</strong> Bạn chỉ đang truy cập được vào mục luyện từ vựng. Nếu bạn nghiêm túc và quyết tâm chinh phục mục tiêu TOEIC trong thời gian tới, hãy liên hệ ngay với Thầy qua Facebook (ở cuối trang) để được mở khóa các tính năng khác <strong>MIỄN PHÍ</strong>. Điều kiện cực kỳ đơn giản: Hãy chia sẻ rõ ràng Kế hoạch chinh phục TOEIC của bạn (<em>Ví dụ: Thời gian luyện thi? Cường độ ôn luyện mỗi tuần? Ngày dự kiến đi thi?</em>).
                 </p>
                 <p>
-                    Thầy sẽ cấp cho bạn tài khoản truy cập vào trang web có thời hạn 6 tháng – một khoảng thời gian lý tưởng để bạn bứt phá. Sau 6 tháng, nếu bạn chưa hoàn thành kỳ thi, tài khoản sẽ được ưu tiên nhường lại cho những học viên mới, đảm bảo tài nguyên được sử dụng hiệu quả nhất!
+                    Thầy sẽ cấp cho bạn tài khoản truy cập vào trang web có thời hạn 6 tháng – một khoảng thời gian lý tưởng và thực tế nhất cho sự bứt phá. Sau 6 tháng, nếu bạn chưa hoàn thành kỳ thi, tài khoản sẽ được ưu tiên nhường lại cho những học viên mới, đảm bảo tài nguyên được sử dụng hiệu quả nhất!
                 </p>
             </div>
         </div>
@@ -105,7 +108,7 @@ const PracticeHub: React.FC<PracticeHubProps> = ({
             </div>
             
             <div className="flex items-center gap-3 mb-6 relative">
-                <TrophyIcon className="h-8 w-8 text-blue-700" />
+                <MoneyEmojiIcon className="h-10 w-10" />
                 <h3 className="text-2xl font-black text-blue-700 uppercase tracking-wider">Hoạt động đổi thưởng</h3>
             </div>
             

@@ -4,6 +4,7 @@ import { PlayIcon, PauseIcon, LinkIcon } from './icons';
 interface AudioPlayerProps {
     audioScript?: string;
     audioSrc?: string;
+    autoPlay?: boolean;
 }
 
 const isGoogleDriveId = (id: string | undefined): id is string => {
@@ -11,7 +12,7 @@ const isGoogleDriveId = (id: string | undefined): id is string => {
     return !!id && !id.includes('/') && !id.startsWith('http') && id.length >= 25;
 };
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc }) => {
+const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc, autoPlay = false }) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [hasError, setHasError] = useState(false);
     const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
@@ -33,10 +34,21 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc }) => {
         const loadVoicesAndSettings = () => {
             const availableVoices = window.speechSynthesis.getVoices();
             if (availableVoices.length > 0) {
-                setVoices(availableVoices);
+                // Prioritize English voices
+                const englishVoices = availableVoices.filter(v => v.lang.startsWith('en-'));
+                setVoices(englishVoices);
+                
                 const savedVoiceURI = localStorage.getItem('tts-voice');
-                const defaultVoice = availableVoices.find(v => v.default) || availableVoices[0];
-                const initialVoice = availableVoices.find(v => v.voiceURI === savedVoiceURI) || defaultVoice;
+                let initialVoice = availableVoices.find(v => v.voiceURI === savedVoiceURI);
+                
+                if (!initialVoice) {
+                    // Try to find a good English default (like Google US English)
+                    initialVoice = englishVoices.find(v => v.name.includes('Google') && v.lang === 'en-US') || 
+                                   englishVoices.find(v => v.lang === 'en-US') || 
+                                   englishVoices[0] || 
+                                   availableVoices[0];
+                }
+                
                 setSelectedVoiceURI(initialVoice?.voiceURI || null);
             }
             const savedRate = localStorage.getItem('tts-rate');
@@ -52,6 +64,13 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc }) => {
             window.speechSynthesis.removeEventListener('voiceschanged', loadVoicesAndSettings);
         };
     }, [driveMode]);
+
+    // Handle voice change
+    const handleVoiceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const uri = e.target.value;
+        setSelectedVoiceURI(uri);
+        localStorage.setItem('tts-voice', uri);
+    };
 
     // Effect for preparing the TTS utterance
     useEffect(() => {
@@ -73,11 +92,16 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc }) => {
         
         u.rate = speechRate;
         u.onend = () => setIsPlaying(false);
+        u.onstart = () => setIsPlaying(true);
+        u.onerror = () => setIsPlaying(false);
         utteranceRef.current = u;
 
-        if (isPlayingRef.current) {
+        if (autoPlay) {
             synth.cancel();
-            synth.speak(u);
+            // Small delay to ensure clean start especially on mobile/chrome
+            setTimeout(() => {
+                synth.speak(u);
+            }, 50);
         }
 
         return () => {
@@ -85,7 +109,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc }) => {
                 synth.cancel();
             }
         };
-    }, [audioScript, selectedVoiceURI, voices, speechRate, driveMode]);
+    }, [audioScript, selectedVoiceURI, voices, speechRate, driveMode, autoPlay]);
 
     // Effect for handling standard <audio> element events
     useEffect(() => {
@@ -104,8 +128,11 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc }) => {
         const onTimeUpdate = () => {
             if (audio) setCurrentTime(audio.currentTime);
         };
-        const onLoadedMetadata = () => {
-            if (audio) setDuration(audio.duration);
+        const onCanPlayThrough = () => {
+            setDuration(audio.duration);
+            if (autoPlay) {
+                audio.play().catch(() => {});
+            }
         };
 
         audio.addEventListener('play', onPlay);
@@ -113,7 +140,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc }) => {
         audio.addEventListener('ended', onEnded);
         audio.addEventListener('error', onError);
         audio.addEventListener('timeupdate', onTimeUpdate);
-        audio.addEventListener('loadedmetadata', onLoadedMetadata);
+        audio.addEventListener('canplaythrough', onCanPlayThrough);
 
         return () => {
             if (audio) {
@@ -122,10 +149,10 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc }) => {
                 audio.removeEventListener('ended', onEnded);
                 audio.removeEventListener('error', onError);
                 audio.removeEventListener('timeupdate', onTimeUpdate);
-                audio.removeEventListener('loadedmetadata', onLoadedMetadata);
+                audio.removeEventListener('canplaythrough', onCanPlayThrough);
             }
         };
-    }, [audioSrc, driveMode]);
+    }, [audioSrc, driveMode, autoPlay]);
     
     // Global cleanup
     useEffect(() => {
@@ -138,7 +165,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc }) => {
     }, []);
 
     const handlePlayPause = useCallback(() => {
-        if (!driveMode && !hasError && audioRef.current) {
+        if (!driveMode && !hasError && audioRef.current && audioSrc) {
             const audio = audioRef.current;
             if (isPlaying) {
                 audio.pause();
@@ -156,7 +183,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc }) => {
                 setIsPlaying(true);
             }
         }
-    }, [isPlaying, driveMode, hasError, audioScript]);
+    }, [isPlaying, driveMode, hasError, audioScript, audioSrc]);
     
     const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (audioRef.current) {
@@ -200,36 +227,56 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc }) => {
     };
 
     return (
-        <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-lg p-4 shadow-inner border border-slate-200 dark:border-slate-700">
-            <div className="flex items-center">
-                {!hasError && audioSrc && <audio ref={audioRef} src={audioSrc} hidden preload="metadata" />}
-                <button 
-                    onClick={handlePlayPause}
-                    className="flex-shrink-0 bg-blue-500 text-white rounded-full h-12 w-12 flex items-center justify-center hover:bg-blue-600 transition-colors shadow-md"
-                >
-                    {isPlaying ? <PauseIcon className="h-6 w-6" /> : <PlayIcon className="h-6 w-6" />}
-                </button>
-                <div className="ml-4 flex-grow">
-                    {!hasError && audioSrc ? (
-                        <div className="flex items-center space-x-3 w-full">
-                            <span className="text-xs font-mono text-slate-500 w-10">{formatTime(currentTime)}</span>
-                            <input
-                                type="range"
-                                min="0"
-                                max={duration || 0}
-                                value={currentTime}
-                                onChange={handleSeek}
-                                className="w-full h-1.5 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer accent-blue-500"
-                            />
-                            <span className="text-xs font-mono text-slate-500 w-10">{formatTime(duration)}</span>
-                        </div>
-                    ) : (
-                        <div className="text-slate-700 dark:text-slate-300">
-                            <p className="font-semibold text-sm">Text-to-Speech Player</p>
-                            <p className="text-xs text-slate-500">Nhấn Play để nghe giáo viên đọc.</p>
-                        </div>
-                    )}
+        <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-2xl p-6 shadow-inner border border-slate-200 dark:border-slate-700">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+                <div className="flex items-center gap-4 flex-grow">
+                    {!hasError && audioSrc && <audio ref={audioRef} src={audioSrc} hidden preload="metadata" />}
+                    <button 
+                        onClick={handlePlayPause}
+                        className="flex-shrink-0 bg-blue-600 text-white rounded-full h-16 w-16 flex items-center justify-center hover:bg-blue-700 transition-all shadow-lg active:scale-95"
+                    >
+                        {isPlaying ? <PauseIcon className="h-8 w-8" /> : <PlayIcon className="h-8 w-8" />}
+                    </button>
+                    <div className="flex-grow">
+                        {!hasError && audioSrc ? (
+                            <div className="flex items-center space-x-3 w-full">
+                                <span className="text-sm font-mono text-slate-500 w-12">{formatTime(currentTime)}</span>
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max={duration || 0}
+                                    value={currentTime}
+                                    onChange={handleSeek}
+                                    className="w-full h-2 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                />
+                                <span className="text-sm font-mono text-slate-500 w-12">{formatTime(duration)}</span>
+                            </div>
+                        ) : (
+                            <div className="text-slate-700 dark:text-slate-300">
+                                <p className="font-black text-lg">Phát âm AI</p>
+                                <p className="text-sm text-slate-500 font-bold uppercase tracking-widest mt-0.5">Nhấn Play để nghe giáo viên đọc</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
+
+                {/* Voice Selector - only for TTS */}
+                {(!audioSrc && voices.length > 0) && (
+                    <div className="flex flex-col sm:w-48">
+                        <label className="text-[10px] font-black text-slate-400 uppercase mb-1 px-1">Giọng đọc</label>
+                        <select 
+                            value={selectedVoiceURI || ''} 
+                            onChange={handleVoiceChange}
+                            className="bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs font-bold rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                        >
+                            {voices.map(voice => (
+                                <option key={voice.voiceURI} value={voice.voiceURI}>
+                                    {voice.name} ({voice.lang})
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { VocabularyTest, VocabItem } from '../types';
 import { updateWordSrsLevel } from '../services/vocabularyService';
-import { BrainIcon, ShuffleIcon, ArrowLeftIcon, ArrowRightIcon, GridIcon, TypeIcon, HeadphoneIcon, LinkIcon, FlipIcon, RefreshIcon } from './icons';
+import { BrainIcon, ShuffleIcon, ArrowLeftIcon, ArrowRightIcon, GridIcon, TypeIcon, HeadphoneIcon, LinkIcon, FlipIcon, RefreshIcon, TestQuizIcon, AudioChoiceIcon, DictationModeIcon, FlashcardsModeIcon } from './icons';
 import AudioPlayer from './AudioPlayer';
 
 type StudyMode = 'flashcards' | 'quiz' | 'matching_game' | 'scrambler' | 'spelling_recall' | 'audio_dictation' | 'definition_match' | 'audio_choice';
@@ -525,16 +525,16 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
     };
 
     const currentWord = deck[currentCardIndex];
-    const activeModeClasses = "bg-blue-600 text-white shadow-md transform scale-105 border-blue-700";
-    const inactiveModeClasses = "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-blue-400 dark:hover:border-blue-500 shadow-sm";
+    const activeModeClasses = "bg-blue-600 text-white shadow-xl transform scale-105 border-blue-700 ring-4 ring-blue-500/20";
+    const inactiveModeClasses = "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-blue-400 dark:hover:border-blue-500 shadow-lg";
 
     const ModeButton: React.FC<{ active: boolean; onClick: () => void; icon: React.FC<any>; label: string }> = ({ active, onClick, icon: Icon, label }) => (
         <button 
             onClick={onClick} 
-            className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 border-2 min-w-[140px] ${active ? activeModeClasses : inactiveModeClasses}`}
+            className={`flex flex-col items-center justify-center gap-4 p-8 rounded-2xl font-black text-xl transition-all duration-300 border-2 w-full aspect-square md:aspect-auto md:h-48 ${active ? activeModeClasses : inactiveModeClasses}`}
         >
-            <Icon className={`h-5 w-5 ${active ? 'text-white' : 'text-blue-500'}`} />
-            <span>{label}</span>
+            <Icon className={`h-12 w-12 ${active ? 'text-white' : 'text-blue-500'}`} />
+            <span className="text-center leading-tight">{label}</span>
         </button>
     );
 
@@ -644,7 +644,7 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
         return (
             <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
                 <div className="mb-8">
-                    <AudioPlayer audioScript={currentQuestion.item.word} />
+                    <AudioPlayer audioScript={currentQuestion.item.word} autoPlay={true} />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
@@ -659,7 +659,7 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
                             if (isCorrect) {
                                 buttonClasses += "bg-green-100 border-green-500 text-green-800 dark:bg-green-900/40 dark:border-green-600 dark:text-green-300";
                             } else if (isSelected) {
-                                buttonClasses += "bg-red-100 border-red-500 text-red-800 dark:bg-red-900/40 dark:border-red-600 dark:text-red-300";
+                                buttonClasses += "bg-red-100 border-red-500 text-red-800 dark:bg-red-900/40 dark:border-green-600 dark:text-green-300";
                             } else {
                                 buttonClasses += "bg-slate-50 border-slate-100 text-slate-400 opacity-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-600";
                             }
@@ -1017,19 +1017,15 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
     
                 <div className="mb-10">
                     <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 text-center">Chế độ luyện tập</h3>
-                    <div className="space-y-4">
-                        <div className="flex flex-wrap justify-center gap-3">
-                            <ModeButton active={mode === 'flashcards'} onClick={() => setMode('flashcards')} icon={FlipIcon} label="Flashcards" />
-                            <ModeButton active={mode === 'quiz'} onClick={() => setMode('quiz')} icon={BrainIcon} label="Quiz" />
-                            <ModeButton active={mode === 'audio_choice'} onClick={() => setMode('audio_choice')} icon={HeadphoneIcon} label="Nghe & Chọn" />
-                            <ModeButton active={mode === 'matching_game'} onClick={() => setMode('matching_game')} icon={GridIcon} label="Matching" />
-                            <ModeButton active={mode === 'definition_match'} onClick={() => setMode('definition_match')} icon={LinkIcon} label="Def Match" />
-                        </div>
-                        <div className="flex flex-wrap justify-center gap-3">
-                            <ModeButton active={mode === 'scrambler'} onClick={() => setMode('scrambler')} icon={ShuffleIcon} label="Scrambler" />
-                            <ModeButton active={mode === 'spelling_recall'} onClick={() => setMode('spelling_recall')} icon={TypeIcon} label="Spelling" />
-                            <ModeButton active={mode === 'audio_dictation'} onClick={() => setMode('audio_dictation')} icon={HeadphoneIcon} label="Dictation" />
-                        </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        <ModeButton active={mode === 'flashcards'} onClick={() => setMode('flashcards')} icon={FlashcardsModeIcon} label="Flashcards" />
+                        <ModeButton active={mode === 'quiz'} onClick={() => setMode('quiz')} icon={TestQuizIcon} label="Quiz" />
+                        <ModeButton active={mode === 'audio_choice'} onClick={() => setMode('audio_choice')} icon={AudioChoiceIcon} label="Nghe & Chọn" />
+                        <ModeButton active={mode === 'matching_game'} onClick={() => setMode('matching_game')} icon={GridIcon} label="Matching" />
+                        <ModeButton active={mode === 'definition_match'} onClick={() => setMode('definition_match')} icon={LinkIcon} label="Def Match" />
+                        <ModeButton active={mode === 'scrambler'} onClick={() => setMode('scrambler')} icon={ShuffleIcon} label="Scrambler" />
+                        <ModeButton active={mode === 'spelling_recall'} onClick={() => setMode('spelling_recall')} icon={TypeIcon} label="Spelling" />
+                        <ModeButton active={mode === 'audio_dictation'} onClick={() => setMode('audio_dictation')} icon={DictationModeIcon} label="Dictation" />
                     </div>
                 </div>
                 
