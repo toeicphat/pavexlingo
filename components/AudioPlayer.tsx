@@ -25,6 +25,8 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc, autoPl
     const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
     const isPlayingRef = useRef(isPlaying);
     isPlayingRef.current = isPlaying;
+    
+    const lastSpokenScriptRef = useRef<string | null>(null);
 
     const driveMode = useMemo(() => isGoogleDriveId(audioSrc), [audioSrc]);
 
@@ -34,9 +36,13 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc, autoPl
         const loadVoicesAndSettings = () => {
             const availableVoices = window.speechSynthesis.getVoices();
             if (availableVoices.length > 0) {
-                // Prioritize English voices
-                const englishVoices = availableVoices.filter(v => v.lang.startsWith('en-'));
-                setVoices(englishVoices);
+                // Prioritize English voices (US, GB, AU, CA, etc.)
+                const englishLocales = ['en-US', 'en-GB', 'en-AU', 'en-CA', 'en-IN', 'en-NZ', 'en-IE', 'en-ZA'];
+                const englishVoices = availableVoices.filter(v => 
+                    englishLocales.some(locale => v.lang.startsWith(locale)) || v.lang.startsWith('en-')
+                );
+                
+                setVoices(englishVoices.length > 0 ? englishVoices : availableVoices);
                 
                 const savedVoiceURI = localStorage.getItem('tts-voice');
                 let initialVoice = availableVoices.find(v => v.voiceURI === savedVoiceURI);
@@ -96,12 +102,14 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc, autoPl
         u.onerror = () => setIsPlaying(false);
         utteranceRef.current = u;
 
-        if (autoPlay) {
+        // Automatically play ONLY IF autoPlay is enabled AND this script hasn't been spoken yet
+        if (autoPlay && lastSpokenScriptRef.current !== audioScript) {
             synth.cancel();
             // Small delay to ensure clean start especially on mobile/chrome
             setTimeout(() => {
                 synth.speak(u);
-            }, 50);
+                lastSpokenScriptRef.current = audioScript;
+            }, 100);
         }
 
         return () => {
@@ -130,8 +138,10 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc, autoPl
         };
         const onCanPlayThrough = () => {
             setDuration(audio.duration);
-            if (autoPlay) {
+            // Auto-play only if the source has changed
+            if (autoPlay && lastSpokenScriptRef.current !== audioSrc) {
                 audio.play().catch(() => {});
+                lastSpokenScriptRef.current = audioSrc || null;
             }
         };
 

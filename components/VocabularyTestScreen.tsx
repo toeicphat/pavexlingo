@@ -54,11 +54,7 @@ type DMatchItemType = { item: VocabItem; type: 'word' | 'definition' };
 
 const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => void }> = ({ testData, onBack }) => {
     const wordsForSession = useMemo(() => {
-        const words = testData.words;
-        if (words.length > 50) {
-            return shuffleArray(words).slice(0, 50);
-        }
-        return words;
+        return testData.words;
     }, [testData.words]);
 
     const [mode, setMode] = useState<StudyMode>('flashcards');
@@ -531,7 +527,7 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
     const ModeButton: React.FC<{ active: boolean; onClick: () => void; icon: React.FC<any>; label: string }> = ({ active, onClick, icon: Icon, label }) => (
         <button 
             onClick={onClick} 
-            className={`flex flex-col items-center justify-center gap-4 p-8 rounded-2xl font-black text-xl transition-all duration-300 border-2 w-full aspect-square md:aspect-auto md:h-48 ${active ? activeModeClasses : inactiveModeClasses}`}
+            className={`flex flex-col items-center justify-center gap-4 p-8 rounded-2xl font-black text-xl transition-all duration-300 border-2 w-full h-48 ${active ? activeModeClasses : inactiveModeClasses}`}
         >
             <Icon className={`h-12 w-12 ${active ? 'text-white' : 'text-blue-500'}`} />
             <span className="text-center leading-tight">{label}</span>

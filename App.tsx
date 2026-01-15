@@ -48,7 +48,12 @@ const mockUsers: User[] = [
     { username: 'chautr5504@gmail.com', password: 'thidautoeic' },
     { username: 'lehan2004.tayninh@gmail.com', password: 'thidautoeic' },
     { username: 'lethingoclinh2310@gmail.com', password: 'thidautoeic' }
+    { username: 'phamkhoanguyen1512@gmail.com', password: 'thidautoeic' }
 ];
+
+const shuffleArray = <T,>(array: T[]): T[] => {
+    return [...array].sort(() => Math.random() - 0.5);
+};
 
 const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>(AppState.PracticeHub);
@@ -95,9 +100,20 @@ const App: React.FC = () => {
     setAppState(AppState.VocabularyPartHome);
   }, []);
 
-  const handleSelectVocabularyTest = useCallback((partId: number, testId: number) => {
+  const handleSelectVocabularyTest = useCallback((partId: number, testId: number, limit?: number) => {
     const test = getVocabularyTest(partId, testId);
-    setSelectedVocabularyTest(test);
+    if (test) {
+        if (limit) {
+            // If a limit is set, shuffle and take only requested amount
+            const limitedTest = {
+                ...test,
+                words: shuffleArray(test.words).slice(0, limit)
+            };
+            setSelectedVocabularyTest(limitedTest);
+        } else {
+            setSelectedVocabularyTest(test);
+        }
+    }
     setAppState(AppState.VocabularyTest);
   }, []);
   
