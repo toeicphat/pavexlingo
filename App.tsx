@@ -49,6 +49,7 @@ const mockUsers: User[] = [
     { username: 'lehan2004.tayninh@gmail.com', password: 'thidautoeic' },
     { username: 'lethingoclinh2310@gmail.com', password: 'thidautoeic' },
     { username: 'phamkhoanguyen1512@gmail.com', password: 'thidautoeic' },
+    { username: 'dieuni2802@gmail.com', password: 'thidautoeic' },
 ];
 
 const shuffleArray = <T,>(array: T[]): T[] => {
