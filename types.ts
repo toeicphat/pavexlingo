@@ -1,5 +1,3 @@
-
-
 export interface User {
     username: string;
     password?: string;
@@ -56,6 +54,8 @@ export interface VocabularyPart {
     title: string;
     description: string;
     tests: VocabularyTest[];
+    isComingSoon?: boolean;
+    isNew?: boolean;
 }
 
 // --- Unified API Configuration ---

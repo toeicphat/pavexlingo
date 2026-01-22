@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { getVocabularyList, getWordsForReview, updateWordSrsLevel, deleteVocabularyWord } from '../services/vocabularyService';
 import { VocabularyWord, VocabularyPart } from '../types';
@@ -224,6 +223,8 @@ const VocabularyScreen: React.FC<VocabularyScreenProps> = ({ onSelectPart }) => 
                             title={part.title}
                             description={part.description}
                             onClick={() => onSelectPart(part.id)}
+                            isComingSoon={part.isComingSoon}
+                            isNew={part.isNew}
                         />
                     ))}
                 </div>

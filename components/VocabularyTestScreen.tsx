@@ -138,8 +138,10 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
 
     const generateAudioChoiceQuestions = useCallback(() => {
         const shuffledWords = shuffleArray(wordsForSession);
-        const questions = shuffledWords.map((correctItem) => {
-            let pool = wordsForSession.filter(w => w.word !== correctItem.word);
+        // Added explicit type annotation (correctItem: VocabItem) to fix 'unknown' type error.
+        const questions = shuffledWords.map((correctItem: VocabItem) => {
+            // Added explicit type annotation (w: VocabItem) to fix 'unknown' type error.
+            let pool = wordsForSession.filter((w: VocabItem) => w.word !== correctItem.word);
             const distractors = shuffleArray(pool).slice(0, 8);
             const options = shuffleArray([correctItem, ...distractors]);
             return {
@@ -165,8 +167,9 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
             return;
         }
 
-        const wordsForGrid = turnItems.map(item => ({ item, type: 'word' as const }));
-        const defsForGrid = turnItems.map(item => ({ item, type: 'definition' as const }));
+        // Added explicit type annotation (item: VocabItem) to ensure type safety.
+        const wordsForGrid = turnItems.map((item: VocabItem) => ({ item, type: 'word' as const }));
+        const defsForGrid = turnItems.map((item: VocabItem) => ({ item, type: 'definition' as const }));
         
         setMatchingGridItems(shuffleArray([...wordsForGrid, ...defsForGrid]));
         setCurrentTurnItems(turnItems);
@@ -277,8 +280,9 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
             return;
         }
         
-        setDMatchWords(turnItems.map(item => ({ item, type: 'word' as const })));
-        setDMatchDefinitions(shuffleArray(turnItems).map(item => ({ item, type: 'definition' as const })));
+        // Added explicit type annotation (item: VocabItem) to fix 'unknown' type error.
+        setDMatchWords(turnItems.map((item: VocabItem) => ({ item, type: 'word' as const })));
+        setDMatchDefinitions(shuffleArray(turnItems).map((item: VocabItem) => ({ item, type: 'definition' as const })));
         
         setFullDMatchDeck(deck);
         setDMatchTurn(turn);

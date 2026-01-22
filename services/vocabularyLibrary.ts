@@ -3,21 +3,25 @@ import { listeningPart1Vocabulary } from './vocabulary/listeningPart1Vocabulary'
 import { listeningComprehensiveVocabulary } from './vocabulary/listeningComprehensiveVocabulary';
 import { listening2026Vocabulary } from './vocabulary/listening2026Vocabulary';
 import { listeningBasicVocabulary } from './vocabulary/listeningBasicVocabulary';
+import { listeningBasic2026Vocabulary } from './vocabulary/listeningBasic2026Vocabulary';
 import { readingPart7Vocabulary } from './vocabulary/readingPart7Vocabulary';
 import { readingComprehensiveVocabulary } from './vocabulary/readingVoca';
 import { reading2026Vocabulary } from './vocabulary/reading2026Vocabulary';
 import { readingPart7IntenseVocabularyData } from './vocabulary/readingPart7IntenseVocabulary';
+import { readingBasic2026Vocabulary } from './vocabulary/readingBasic2026Vocabulary';
 
 let allWordsCache: string[] | null = null;
 
 export const vocabularyData: VocabularyPart[] = [
     listeningPart1Vocabulary,
     listeningBasicVocabulary,
+    listeningBasic2026Vocabulary,
     listeningComprehensiveVocabulary,
     listening2026Vocabulary,
     readingPart7Vocabulary,
     readingComprehensiveVocabulary,
     reading2026Vocabulary,
+    readingBasic2026Vocabulary,
     readingPart7IntenseVocabularyData,
 ];
 
