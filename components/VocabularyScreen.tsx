@@ -1,23 +1,31 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { getVocabularyList, getWordsForReview, updateWordSrsLevel, deleteVocabularyWord } from '../services/vocabularyService';
-import { VocabularyWord, VocabularyPart } from '../types';
-import { LoadingIcon, BrainIcon, BookOpenIcon, TrashIcon, LightBulbIcon } from './icons';
+import { VocabularyWord, VocabularyPart, VocabularyTest } from '../types';
+import { LoadingIcon, BrainIcon, BookOpenIcon, TrashIcon, LightBulbIcon, PlusIcon, PencilIcon } from './icons';
 import { vocabularyData } from '../services/vocabularyLibrary';
+import { getCustomSets, saveCustomSet, deleteCustomSet, parseVocabularyInput } from '../services/customVocabularyService';
 import SelectionCard from './SelectionCard';
 
-type InternalView = 'main_hub' | 'srs_hub' | 'srs_review' | 'srs_list';
+type InternalView = 'main_hub' | 'srs_hub' | 'srs_review' | 'srs_list' | 'custom_hub' | 'create_custom_set';
 
 interface VocabularyScreenProps {
     onSelectPart: (partId: number) => void;
+    onStartCustomTest?: (test: VocabularyTest) => void;
 }
 
-const VocabularyScreen: React.FC<VocabularyScreenProps> = ({ onSelectPart }) => {
+const VocabularyScreen: React.FC<VocabularyScreenProps> = ({ onSelectPart, onStartCustomTest }) => {
     const [view, setView] = useState<InternalView>('main_hub');
     const [allWords, setAllWords] = useState<VocabularyWord[]>([]);
     const [reviewQueue, setReviewQueue] = useState<VocabularyWord[]>([]);
     const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
     const [isDefinitionVisible, setIsDefinitionVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+
+    // Custom set state
+    const [customSets, setCustomSets] = useState<VocabularyTest[]>([]);
+    const [newSetTitle, setNewSetTitle] = useState('');
+    const [newSetContent, setNewSetContent] = useState('');
+    const [parsedPreview, setParsedPreview] = useState<any[]>([]);
 
     const loadSrsWords = useCallback(async () => {
         setIsLoading(true);
@@ -26,13 +34,20 @@ const VocabularyScreen: React.FC<VocabularyScreenProps> = ({ onSelectPart }) => 
         setIsLoading(false);
     }, []);
 
+    const loadCustomSets = useCallback(() => {
+        setCustomSets(getCustomSets());
+    }, []);
+
     useEffect(() => {
-        if (view !== 'main_hub') {
+        if (view === 'srs_hub' || view === 'srs_review' || view === 'srs_list') {
             loadSrsWords();
+        } else if (view === 'custom_hub') {
+            loadCustomSets();
+            setIsLoading(false);
         } else {
             setIsLoading(false);
         }
-    }, [view, loadSrsWords]);
+    }, [view, loadSrsWords, loadCustomSets]);
     
     const wordsDueForReview = useMemo(() => getWordsForReview(allWords), [allWords]);
 
@@ -63,6 +78,163 @@ const VocabularyScreen: React.FC<VocabularyScreenProps> = ({ onSelectPart }) => 
             loadSrsWords(); // Refetch the list
         }
     };
+
+    // Custom Set Handlers
+    const handleSaveCustomSet = () => {
+        if (!newSetTitle.trim()) {
+            alert("Please enter a title for your set.");
+            return;
+        }
+        const words = parseVocabularyInput(newSetContent);
+        if (words.length === 0) {
+            alert("Please enter at least one word.");
+            return;
+        }
+
+        const newSet: VocabularyTest = {
+            id: Date.now(),
+            title: newSetTitle,
+            words: words
+        };
+
+        saveCustomSet(newSet);
+        setNewSetTitle('');
+        setNewSetContent('');
+        setParsedPreview([]);
+        setView('custom_hub');
+    };
+
+    const handleDeleteCustomSet = (id: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (window.confirm("Are you sure you want to delete this set?")) {
+            deleteCustomSet(id);
+            loadCustomSets();
+        }
+    };
+
+    useEffect(() => {
+        if (view === 'create_custom_set') {
+            const words = parseVocabularyInput(newSetContent);
+            setParsedPreview(words);
+        }
+    }, [newSetContent, view]);
+
+
+    const renderCreateCustomSet = () => (
+        <div className="max-w-4xl mx-auto">
+             <button onClick={() => setView('custom_hub')} className="mb-6 inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                Back to My Custom Sets
+            </button>
+            <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200">
+                <h2 className="text-2xl font-bold text-slate-800 mb-6">Create New Vocabulary Set</h2>
+                
+                <div className="mb-6">
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Set Title</label>
+                    <input 
+                        type="text" 
+                        value={newSetTitle}
+                        onChange={(e) => setNewSetTitle(e.target.value)}
+                        className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        placeholder="e.g., My Difficult Words"
+                    />
+                </div>
+
+                <div className="mb-6">
+                    <label className="block text-sm font-bold text-slate-700 mb-2">
+                        Words & Definitions 
+                        <span className="font-normal text-slate-500 ml-2 text-xs">(Format: word - definition, or word, definition)</span>
+                    </label>
+                    <textarea 
+                        value={newSetContent}
+                        onChange={(e) => setNewSetContent(e.target.value)}
+                        className="w-full h-64 p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm"
+                        placeholder={`flower - hoa\nbake, nướng\ncontrol; điều khiển`}
+                    />
+                </div>
+
+                <div className="flex justify-between items-center">
+                    <div className="text-sm text-slate-500">
+                        {parsedPreview.length} words recognized
+                    </div>
+                    <button 
+                        onClick={handleSaveCustomSet}
+                        className="px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                        Save Set
+                    </button>
+                </div>
+
+                {parsedPreview.length > 0 && (
+                    <div className="mt-8 pt-8 border-t border-slate-200">
+                        <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Preview</h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {parsedPreview.slice(0, 6).map((item, idx) => (
+                                <div key={idx} className="flex justify-between p-2 bg-slate-50 rounded border border-slate-200 text-sm">
+                                    <span className="font-semibold text-slate-700">{item.word}</span>
+                                    <span className="text-slate-500">{item.definition}</span>
+                                </div>
+                            ))}
+                            {parsedPreview.length > 6 && <div className="text-sm text-slate-400 italic p-2">...and {parsedPreview.length - 6} more</div>}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+
+    const renderCustomHub = () => (
+        <div className="max-w-6xl mx-auto">
+             <button onClick={() => setView('main_hub')} className="mb-8 inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                Back to Vocabulary Hub
+            </button>
+            
+            <div className="flex justify-between items-center mb-8">
+                <h2 className="text-3xl font-extrabold text-slate-900">Tự chọn (Custom Sets)</h2>
+                <button 
+                    onClick={() => setView('create_custom_set')}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors"
+                >
+                    <PlusIcon className="h-5 w-5" />
+                    Create New Set
+                </button>
+            </div>
+
+            {customSets.length === 0 ? (
+                <div className="text-center py-16 bg-white rounded-xl border-2 border-dashed border-slate-300">
+                    <PencilIcon className="h-12 w-12 text-slate-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-bold text-slate-500">No custom sets yet</h3>
+                    <p className="text-slate-400 mt-2">Create your own vocabulary lists to practice specific words.</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {customSets.map(set => (
+                        <div 
+                            key={set.id}
+                            onClick={() => onStartCustomTest && onStartCustomTest(set)}
+                            className="bg-white p-6 rounded-xl shadow-md border border-slate-200 hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer relative group"
+                        >
+                            <h3 className="text-xl font-bold text-slate-800 mb-2 pr-8">{set.title}</h3>
+                            <p className="text-slate-500">{set.words.length} words</p>
+                            
+                            <button 
+                                onClick={(e) => handleDeleteCustomSet(set.id, e)}
+                                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors opacity-0 group-hover:opacity-100"
+                                title="Delete Set"
+                            >
+                                <TrashIcon className="h-5 w-5" />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
     
     const renderSrsHub = () => (
         <div className="max-w-4xl mx-auto">
@@ -227,6 +399,25 @@ const VocabularyScreen: React.FC<VocabularyScreenProps> = ({ onSelectPart }) => 
                             isNew={part.isNew}
                         />
                     ))}
+                    
+                    {/* New "Tự chọn" Section */}
+                    <button 
+                        onClick={() => setView('custom_hub')}
+                        className="bg-white p-6 rounded-xl shadow-lg transition-all duration-300 cursor-pointer border-2 border-dashed border-blue-300 hover:border-blue-500 hover:shadow-xl hover:-translate-y-1 text-left w-full h-full flex flex-col relative overflow-hidden group"
+                    >
+                         <div className="absolute top-0 right-0">
+                            <div className="bg-blue-500 text-white text-[10px] font-bold px-3 py-1 shadow-md rounded-bl-lg">
+                                Tự tạo
+                            </div>
+                        </div>
+                        <div>
+                            <div className="flex items-center mb-2">
+                                <h3 className="text-xl font-bold text-slate-800 mr-2">Tự chọn (Custom)</h3>
+                                <PencilIcon className="h-5 w-5 text-blue-500" />
+                            </div>
+                            <p className="text-slate-500 text-sm flex-grow">Tự tạo từ vựng cá nhân hóa. ***Lưu ý*** Từ vựng chỉ lưu lại trong thiết bị bạn đã tạo từ vựng</p>
+                        </div>
+                    </button>
                 </div>
             </div>
 
@@ -258,6 +449,10 @@ const VocabularyScreen: React.FC<VocabularyScreenProps> = ({ onSelectPart }) => 
                 return renderSrsReviewSession();
             case 'srs_list':
                 return renderSrsWordList();
+            case 'custom_hub':
+                return renderCustomHub();
+            case 'create_custom_set':
+                return renderCreateCustomSet();
             default:
                 return renderMainHub();
         }

@@ -90,7 +90,7 @@ const PracticeHub: React.FC<PracticeHubProps> = ({
         <div className="relative overflow-hidden p-8 rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-400 to-amber-500 border-2 border-yellow-200/50 shadow-xl shadow-yellow-500/10 shine flex flex-col justify-center">
             <div className="relative text-red-900 space-y-4 font-medium">
                 <p>
-                    <strong>Lưu ý:</strong> Bạn chỉ đang truy cập được vào mục luyện từ vựng. Nếu bạn nghiêm túc và quyết tâm chinh phục mục tiêu TOEIC trong thời gian tới, hãy liên hệ ngay với Thầy qua Facebook (ở cuối trang) để được mở khóa các tính năng khác <strong>MIỄN PHÍ</strong>. Điều kiện cực kỳ đơn giản: Hãy chia sẻ rõ ràng Kế hoạch chinh phục TOEIC của bạn (<em>Ví dụ: Thời gian luyện thi? Cường độ ôn luyện mỗi tuần? Ngày dự kiến đi thi?</em>).
+                    <strong>Lưu ý:</strong> Bạn chỉ đang truy cập được vào mục TỪ VỰNG. Nếu bạn nghiêm túc và quyết tâm chinh phục mục tiêu TOEIC trong thời gian tới, hãy liên hệ ngay với Thầy qua Facebook (ở cuối trang) để được mở khóa các tính năng khác <strong>MIỄN PHÍ</strong>. Điều kiện cực kỳ đơn giản: Hãy chia sẻ rõ ràng Kế hoạch chinh phục TOEIC của bạn (<em>Ví dụ: Thời gian luyện thi? Cường độ ôn luyện mỗi tuần? Ngày dự kiến đi thi?</em>).
                 </p>
                 <p>
                     Thầy sẽ cấp cho bạn tài khoản truy cập vào trang web có thời hạn 6 tháng – một khoảng thời gian lý tưởng và thực tế nhất cho sự bứt phá. Sau 6 tháng, nếu bạn chưa hoàn thành kỳ thi, tài khoản sẽ được ưu tiên nhường lại cho những học viên mới, đảm bảo tài nguyên được sử dụng hiệu quả nhất!

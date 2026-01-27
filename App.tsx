@@ -19,26 +19,14 @@ import { LogoIcon } from './components/icons';
 const mockUsers: User[] = [
     { username: 'admin', password: 'phattoeic' },
     { username: 'tester', password: '123456' },
-    { username: 'hongquyen22102004@gmail.com', password: 'thidautoeic' },
-    { username: 'myquynh070404@gmail.com', password: 'thidautoeic' },
-    { username: 'ltrieuvy181104@gmail.com', password: 'thidautoeic' },
     { username: 'hoangphuctayninh1708@gmail.com', password: 'thidautoeic' },
-    { username: 'V0932089072@gmail.com', password: 'thidautoeic' },
     { username: 'ntkimphuc.work@gmail.com', password: 'thidautoeic' },
-    { username: 'thupham.241004@gmail.com', password: 'thidautoeic' },
-    { username: 'luongthihongquy2240@gmail.com', password: 'thidautoeic' },
     { username: 'luongzattu800@gmail.com', password: 'thidautoeic' },
-    { username: 'tranvi06042004@gmail.com', password: 'thidautoeic' },
     { username: 'phammynhu6104@gmail.com', password: 'thidautoeic' },
     { username: 'minhchungsuke121@gmail.com', password: 'thidautoeic' },
     { username: 'cnk0710.cv@gmail.com', password: 'thidautoeic' },
     { username: 'nttuephuong.2211@gmail.com', password: 'thidautoeic' },
-    { username: 'tranquochai17753@gmail.com', password: 'thidautoeic' },
     { username: 'vothuyphuonguyen01@gmail.com', password: 'thidautoeic' },
-    { username: 'minhtholeabc@gmail.com', password: 'thidautoeic' },
-    { username: 'hav8756@gmail.com', password: 'thidautoeic' },
-    { username: 'vodieu937@gmail.com', password: 'thidautoeic' },
-    { username: 'buingocanh2046@gmail.com', password: 'thidautoeic' },
     { username: 'kieuanhnguyen322@gmail.com', password: 'thidautoeic' },
     { username: 'luongthaonguyen2002@gmail.com', password: 'thidautoeic' },
     { username: 'pebanh0505@gmail.com', password: 'thidautoeic' },
@@ -118,6 +106,11 @@ const App: React.FC = () => {
     }
     setAppState(AppState.VocabularyTest);
   }, []);
+
+  const handleStartCustomTest = useCallback((test: VocabularyTest) => {
+      setSelectedVocabularyTest(test);
+      setAppState(AppState.VocabularyTest);
+  }, []);
   
   const handleBackToVocabularyHome = useCallback(() => {
       setSelectedVocabularyPart(null);
@@ -125,9 +118,15 @@ const App: React.FC = () => {
   }, []);
   
   const handleBackToVocabularyPartHome = useCallback(() => {
-      setSelectedVocabularyTest(null);
-      setAppState(AppState.VocabularyPartHome);
-  }, []);
+      // If we are coming back from a custom test (no selectedVocabularyPart), go to VocabularyHome
+      if (!selectedVocabularyPart) {
+          setSelectedVocabularyTest(null);
+          setAppState(AppState.VocabularyHome);
+      } else {
+          setSelectedVocabularyTest(null);
+          setAppState(AppState.VocabularyPartHome);
+      }
+  }, [selectedVocabularyPart]);
 
     const handleNavigateToVocabulary = useCallback(() => setAppState(AppState.VocabularyHome), []);
 
@@ -204,7 +203,12 @@ const App: React.FC = () => {
             case AppState.Login:
                 return <LoginScreen onLoginSuccess={handleLoginSuccess} users={mockUsers} />;
             case AppState.VocabularyHome:
-                return <VocabularyScreen onSelectPart={handleSelectVocabularyPart} />;
+                return (
+                    <VocabularyScreen 
+                        onSelectPart={handleSelectVocabularyPart} 
+                        onStartCustomTest={handleStartCustomTest}
+                    />
+                );
             case AppState.VocabularyPartHome:
                 if (!selectedVocabularyPart) return null;
                 return <VocabularyPartScreen partData={selectedVocabularyPart} onSelectTest={handleSelectVocabularyTest} onBack={handleBackToVocabularyHome} />;
