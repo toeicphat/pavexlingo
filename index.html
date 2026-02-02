@@ -52,6 +52,14 @@
         backface-visibility: hidden;
         perspective: 1000px;
       }
+
+      @keyframes zoom-out-in {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(0.95); }
+      }
+      .animate-zoom-out-in {
+        animation: zoom-out-in 2s infinite ease-in-out;
+      }
     </style>
   <script type="importmap">
 {

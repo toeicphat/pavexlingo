@@ -194,7 +194,7 @@ const VocabularyScreen: React.FC<VocabularyScreenProps> = ({ onSelectPart, onSta
                 Back to Vocabulary Hub
             </button>
             
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex justify-between items-center mb-2">
                 <h2 className="text-3xl font-extrabold text-slate-900">Tự chọn (Custom Sets)</h2>
                 <button 
                     onClick={() => setView('create_custom_set')}
@@ -204,6 +204,10 @@ const VocabularyScreen: React.FC<VocabularyScreenProps> = ({ onSelectPart, onSta
                     Create New Set
                 </button>
             </div>
+
+            <p className="text-red-500 font-bold mb-8 animate-zoom-out-in text-center sm:text-left">
+                Lưu ý: Từ vựng chỉ lưu lại trong thiết bị bạn đã tạo từ vựng
+            </p>
 
             {customSets.length === 0 ? (
                 <div className="text-center py-16 bg-white rounded-xl border-2 border-dashed border-slate-300">
@@ -415,7 +419,7 @@ const VocabularyScreen: React.FC<VocabularyScreenProps> = ({ onSelectPart, onSta
                                 <h3 className="text-xl font-bold text-slate-800 mr-2">Tự chọn (Custom)</h3>
                                 <PencilIcon className="h-5 w-5 text-blue-500" />
                             </div>
-                            <p className="text-slate-500 text-sm flex-grow">Tự tạo từ vựng cá nhân hóa. ***Lưu ý*** Từ vựng chỉ lưu lại trong thiết bị bạn đã tạo từ vựng</p>
+                            <p className="text-slate-500 text-sm flex-grow">Tự tạo từ vựng cá nhân hóa.</p>
                         </div>
                     </button>
                 </div>
