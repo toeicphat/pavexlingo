@@ -36,7 +36,6 @@ const mockUsers: User[] = [
     { username: 'chautr5504@gmail.com', password: 'thidautoeic' },
     { username: 'lehan2004.tayninh@gmail.com', password: 'thidautoeic' },
     { username: 'lethingoclinh2310@gmail.com', password: 'thidautoeic' },
-    { username: 'phamkhoanguyen1512@gmail.com', password: 'thidautoeic' },
     { username: 'dieuni2802@gmail.com', password: 'thidautoeic' },
     { username: 'nguyenthimyuyen1442014@gmail.com', password: 'thidautoeic' },
     { username: 'minhquan28032004@gmail.com', password: 'thidautoeic' },
