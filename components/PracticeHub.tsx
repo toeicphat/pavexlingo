@@ -1,10 +1,11 @@
 import React from 'react';
-import { SectionVocabIcon, SectionDictationIcon, SectionGrammarIcon, MoneyEmojiIcon, SparklesIcon, TargetFillIcon } from './icons';
+import { SectionVocabIcon, SectionDictationIcon, SectionGrammarIcon, MoneyEmojiIcon, SparklesIcon, TargetFillIcon, HeadphoneIcon } from './icons';
 
 interface PracticeHubProps {
   onNavigateToVocabulary: () => void;
   onNavigateToDictation: () => void;
   onNavigateToGrammar: () => void;
+  onNavigateToListeningIntense: () => void;
   isLoggedIn: boolean;
 }
 
@@ -45,6 +46,7 @@ const PracticeHub: React.FC<PracticeHubProps> = ({
     onNavigateToVocabulary,
     onNavigateToDictation,
     onNavigateToGrammar,
+    onNavigateToListeningIntense,
     isLoggedIn
 }) => {
   return (
@@ -59,7 +61,7 @@ const PracticeHub: React.FC<PracticeHubProps> = ({
           Vì đây là sản phẩm đang phát triển. Nếu có sai sót, xin vui lòng nhắn tin cho thầy Phát qua Facebook cá nhân ở cuối trang.
         </p>
       </div>
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         <PracticeCard 
             title="Từ vựng"
             description="Luyện tập từ vựng qua hệ thống lặp lại ngắt quãng (SRS) và các trò chơi tương tác."
@@ -69,7 +71,7 @@ const PracticeHub: React.FC<PracticeHubProps> = ({
         />
         <PracticeCard 
             title="Chép chính tả"
-            description="Luyện nghe sâu và cải thiện chính tả qua các bài nghe từ kho đề ETS 2024."
+            description="Luyện nghe sâu và cải thiện chính tả qua các bài nghe từ kho đề ETS."
             onClick={onNavigateToDictation}
             icon={SectionDictationIcon}
             iconColor="text-orange-500"
@@ -81,6 +83,14 @@ const PracticeHub: React.FC<PracticeHubProps> = ({
             onClick={onNavigateToGrammar}
             icon={SectionGrammarIcon}
             iconColor="text-green-600"
+            faded={!isLoggedIn}
+        />
+        <PracticeCard 
+            title="Listening (Chuyên sâu)"
+            description="Luyện tập nghe hiểu theo hình thức chuyên sâu."
+            onClick={onNavigateToListeningIntense}
+            icon={HeadphoneIcon}
+            iconColor="text-blue-600"
             faded={!isLoggedIn}
         />
       </div>

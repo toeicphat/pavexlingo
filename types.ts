@@ -16,6 +16,8 @@ export enum AppState {
     GrammarHub = 'GRAMMAR_HUB',
     GrammarTopic = 'GRAMMAR_TOPIC',
     GrammarRandomTest = 'GRAMMAR_RANDOM_TEST',
+    ListeningIntenseHub = 'LISTENING_INTENSE_HUB',
+    ListeningIntensePractice = 'LISTENING_INTENSE_PRACTICE',
     Login = 'LOGIN',
 }
 
@@ -103,6 +105,28 @@ export interface LibraryDictationExercise extends DictationExercise {
     audioSrc: string;
 }
 
+// Listening Intense Types
+export interface ListeningIntenseSentence {
+    id: string;
+    text: string;
+    words: string[];
+}
+
+export interface ListeningIntenseConversation {
+    id: number;
+    title: string;
+    sentences: ListeningIntenseSentence[];
+}
+
+export interface ListeningIntenseTestData {
+    id: number;
+    title: string;
+    part1: ListeningIntenseConversation[];
+    part2: ListeningIntenseConversation[];
+    part3: ListeningIntenseConversation[];
+    part4: ListeningIntenseConversation[];
+}
+
 // For Determiner Exercise
 export interface DeterminerExercise {
     paragraph: string;
@@ -156,7 +180,6 @@ export interface TestResult {
 }
 
 // Core Progress Categories
-// FIX: Added 'writing' and 'speaking' to ProgressCategory
 export type ProgressCategory = 'vocabulary' | 'reading' | 'grammar' | 'listening' | 'writing' | 'speaking';
 
 export type UserProgress = {
@@ -171,7 +194,6 @@ export interface UserSettings {
     darkMode: boolean;
 }
 
-// FIX: Added missing speaking and writing types
 export interface SpeakingPart1EvaluationResult {
     taskScore: number;
     estimatedScoreBand: string;

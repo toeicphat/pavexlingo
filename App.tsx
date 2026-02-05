@@ -11,9 +11,12 @@ import GrammarScreen from './components/GrammarScreen';
 import GrammarTopicScreen from './components/GrammarTopicScreen';
 import TestScreen from './components/TestScreen';
 import LoginScreen from './components/LoginScreen';
+import ListeningIntenseScreen from './components/ListeningIntenseScreen';
+import ListeningIntensePracticeScreen from './components/ListeningIntensePracticeScreen';
 import { AppState, VocabularyTest, VocabularyPart, User, DictationMode, TestData, UserAnswers } from './types';
 import { getVocabularyPart, getVocabularyTest } from './services/vocabularyLibrary';
 import { allDictationTests, getDictationExercisesForParts } from './services/dictationLibrary';
+import { getListeningIntenseTest } from './services/listeningIntenseLibrary';
 import { LogoIcon } from './components/icons';
 
 const mockUsers: User[] = [
@@ -36,10 +39,10 @@ const mockUsers: User[] = [
     { username: 'chautr5504@gmail.com', password: 'thidautoeic' },
     { username: 'lehan2004.tayninh@gmail.com', password: 'thidautoeic' },
     { username: 'lethingoclinh2310@gmail.com', password: 'thidautoeic' },
+    { username: 'phamkhoanguyen1512@gmail.com', password: 'thidautoeic' },
     { username: 'dieuni2802@gmail.com', password: 'thidautoeic' },
     { username: 'nguyenthimyuyen1442014@gmail.com', password: 'thidautoeic' },
     { username: 'minhquan28032004@gmail.com', password: 'thidautoeic' },
-
 ];
 
 const shuffleArray = <T,>(array: T[]): T[] => {
@@ -63,6 +66,9 @@ const App: React.FC = () => {
   const [selectedGrammarTopic, setSelectedGrammarTopic] = useState<string | null>(null);
   const [grammarRandomTestData, setGrammarRandomTestData] = useState<TestData | null>(null);
 
+  // Listening Intense State
+  const [listeningIntenseData, setListeningIntenseData] = useState<any>(null);
+
   const handleGoHome = useCallback(() => {
     setSelectedVocabularyPart(null);
     setSelectedVocabularyTest(null);
@@ -70,6 +76,7 @@ const App: React.FC = () => {
     setSelectedDictationParts([]);
     setSelectedGrammarTopic(null);
     setGrammarRandomTestData(null);
+    setListeningIntenseData(null);
     setAppState(AppState.PracticeHub);
   }, []);
   
@@ -179,6 +186,28 @@ const App: React.FC = () => {
         setAppState(AppState.GrammarHub);
     }, []);
 
+    // Listening Intense Handlers
+    const handleNavigateToListeningIntense = useCallback(() => {
+        if (!currentUser) {
+            alert("Bạn cần đăng nhập để sử dụng tính năng này");
+            return;
+        }
+        setAppState(AppState.ListeningIntenseHub);
+    }, [currentUser]);
+
+    const handleSelectListeningIntensePart = useCallback((testId: number, part: 'part1' | 'part2' | 'part3' | 'part4') => {
+        const test = getListeningIntenseTest(testId);
+        if (test) {
+            setListeningIntenseData(test[part]);
+            setAppState(AppState.ListeningIntensePractice);
+        }
+    }, []);
+
+    const handleBackToListeningIntenseHub = useCallback(() => {
+        setListeningIntenseData(null);
+        setAppState(AppState.ListeningIntenseHub);
+    }, []);
+
     const dictationPracticeData = useMemo(() => {
         if (selectedDictationTestId === null) return null;
         const testSet = allDictationTests.find(t => t.id === selectedDictationTestId);
@@ -196,6 +225,7 @@ const App: React.FC = () => {
             onNavigateToVocabulary: handleNavigateToVocabulary,
             onNavigateToDictation: handleNavigateToDictation,
             onNavigateToGrammar: handleNavigateToGrammar,
+            onNavigateToListeningIntense: handleNavigateToListeningIntense,
             isLoggedIn: !!currentUser
         };
         switch (appState) {
@@ -240,7 +270,8 @@ const App: React.FC = () => {
                 );
             case AppState.GrammarHub:
                 if (!currentUser) return <PracticeHub {...practiceHubProps} />;
-                return <GrammarScreen onSelectTopic={handleSelectGrammarTopic} onStartRandomTest={handleStartGrammarRandomTest} />;
+                return (
+                    <GrammarScreen onSelectTopic={handleSelectGrammarTopic} onStartRandomTest={handleStartGrammarRandomTest} />;
             case AppState.GrammarTopic:
                 if (!selectedGrammarTopic) return null;
                 return <GrammarTopicScreen topic={selectedGrammarTopic} onBack={handleBackToGrammarHub} />;
@@ -256,6 +287,14 @@ const App: React.FC = () => {
                         }} 
                     />
                 );
+            case AppState.ListeningIntenseHub:
+                if (!currentUser) return <PracticeHub {...practiceHubProps} />;
+                return (
+                    <ListeningIntenseScreen onBack={handleGoHome} onSelectPart={handleSelectListeningIntensePart} />
+                );
+            case AppState.ListeningIntensePractice:
+                if (!listeningIntenseData) return null;
+                return <ListeningIntensePracticeScreen data={listeningIntenseData} onBack={handleBackToListeningIntenseHub} />;
             default:
                 return <PracticeHub {...practiceHubProps} />;
         }
@@ -292,7 +331,7 @@ const App: React.FC = () => {
                 </nav>
             </header>
     
-            <main className="py-8">
+                        <main className="py-8">
                 {renderContent()}
             </main>
             

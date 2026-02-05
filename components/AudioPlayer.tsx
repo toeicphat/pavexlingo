@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { PlayIcon, PauseIcon, LinkIcon } from './icons';
+import { PlayIcon, PauseIcon, LinkIcon, PlusIcon, MinusIcon } from './icons';
 
 interface AudioPlayerProps {
     audioScript?: string;
@@ -78,6 +78,21 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc, autoPl
         localStorage.setItem('tts-voice', uri);
     };
 
+    const handleSpeedChange = useCallback((change: number) => {
+        setSpeechRate(prev => {
+            const newRate = Math.max(0.5, Math.min(2.0, parseFloat((prev + change).toFixed(1))));
+            localStorage.setItem('tts-rate', newRate.toString());
+            return newRate;
+        });
+    }, []);
+
+    // Effect for updating HTML Audio playback rate
+    useEffect(() => {
+        if (audioRef.current) {
+            audioRef.current.playbackRate = speechRate;
+        }
+    }, [speechRate]);
+
     // Effect for preparing the TTS utterance
     useEffect(() => {
         if (driveMode || !audioScript) {
@@ -138,6 +153,9 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc, autoPl
         };
         const onCanPlayThrough = () => {
             setDuration(audio.duration);
+            // Apply speed setting when audio is ready
+            audio.playbackRate = speechRate;
+            
             // Auto-play only if the source has changed
             if (autoPlay && lastSpokenScriptRef.current !== audioSrc) {
                 audio.play().catch(() => {});
@@ -162,7 +180,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc, autoPl
                 audio.removeEventListener('canplaythrough', onCanPlayThrough);
             }
         };
-    }, [audioSrc, driveMode, autoPlay]);
+    }, [audioSrc, driveMode, autoPlay]); // Removed speechRate from deps to avoid re-binding listeners
     
     // Global cleanup
     useEffect(() => {
@@ -270,6 +288,30 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc, autoPl
                     </div>
                 </div>
 
+                {/* Speed Control */}
+                <div className="flex flex-col items-center justify-center min-w-[5rem]">
+                    <label className="text-[10px] font-black text-slate-400 uppercase mb-1 px-1">Tốc độ</label>
+                    <div className="flex items-center gap-1 bg-white dark:bg-slate-700 rounded-lg p-1 border border-slate-300 dark:border-slate-600 shadow-sm">
+                        <button 
+                            onClick={() => handleSpeedChange(-0.1)} 
+                            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-600 rounded text-slate-600 dark:text-slate-300 transition-colors"
+                            aria-label="Slow down"
+                        >
+                            <MinusIcon className="h-3 w-3" />
+                        </button>
+                        <span className="text-xs font-bold w-8 text-center text-slate-700 dark:text-slate-200 tabular-nums">
+                            {speechRate.toFixed(1)}x
+                        </span>
+                        <button 
+                            onClick={() => handleSpeedChange(0.1)} 
+                            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-600 rounded text-slate-600 dark:text-slate-300 transition-colors"
+                            aria-label="Speed up"
+                        >
+                            <PlusIcon className="h-3 w-3" />
+                        </button>
+                    </div>
+                </div>
+
                 {/* Voice Selector - only for TTS */}
                 {(!audioSrc && voices.length > 0) && (
                     <div className="flex flex-col sm:w-48">
@@ -277,7 +319,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc, autoPl
                         <select 
                             value={selectedVoiceURI || ''} 
                             onChange={handleVoiceChange}
-                            className="bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs font-bold rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs font-bold rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none w-full"
                         >
                             {voices.map(voice => (
                                 <option key={voice.voiceURI} value={voice.voiceURI}>
