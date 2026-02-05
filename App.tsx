@@ -270,7 +270,7 @@ const App: React.FC = () => {
             case AppState.GrammarHub:
                 if (!currentUser) return <PracticeHub {...practiceHubProps} />;
                 return (
-                    <GrammarScreen onSelectTopic={handleSelectGrammarTopic} onStartRandomTest={handleStartGrammarRandomTest} />;
+                    <GrammarScreen onSelectTopic={handleSelectGrammarTopic} onStartRandomTest={handleStartGrammarRandomTest} />)
             case AppState.GrammarTopic:
                 if (!selectedGrammarTopic) return null;
                 return <GrammarTopicScreen topic={selectedGrammarTopic} onBack={handleBackToGrammarHub} />;
