@@ -27,22 +27,16 @@ const mockUsers: User[] = [
     { username: 'luongzattu800@gmail.com', password: 'thidautoeic' },
     { username: 'phammynhu6104@gmail.com', password: 'thidautoeic' },
     { username: 'minhchungsuke121@gmail.com', password: 'thidautoeic' },
-    { username: 'cnk0710.cv@gmail.com', password: 'thidautoeic' },
     { username: 'nttuephuong.2211@gmail.com', password: 'thidautoeic' },
-    { username: 'vothuyphuonguyen01@gmail.com', password: 'thidautoeic' },
     { username: 'kieuanhnguyen322@gmail.com', password: 'thidautoeic' },
     { username: 'luongthaonguyen2002@gmail.com', password: 'thidautoeic' },
-    { username: 'pebanh0505@gmail.com', password: 'thidautoeic' },
     { username: 'nguyenkimkhanh278@gmail.com', password: 'thidautoeic' },
     { username: 'tl240806@gmail.com', password: 'thidautoeic' },
-    { username: 'ngoctram3490@gmail.com', password: 'thidautoeic' },
-    { username: 'chautr5504@gmail.com', password: 'thidautoeic' },
     { username: 'lehan2004.tayninh@gmail.com', password: 'thidautoeic' },
     { username: 'lethingoclinh2310@gmail.com', password: 'thidautoeic' },
-    { username: 'dieuni2802@gmail.com', password: 'thidautoeic' },
     { username: 'nguyenthimyuyen1442014@gmail.com', password: 'thidautoeic' },
     { username: 'minhquan28032004@gmail.com', password: 'thidautoeic' },
-    { username: 'vungocthaonhi2004.td@gmail.com', password: 'thidautoeic' },
+    { username: 'giangtuyetcutes1@gmail.com', password: 'thidautoeic' },
 ];
 
 const shuffleArray = <T,>(array: T[]): T[] => {
