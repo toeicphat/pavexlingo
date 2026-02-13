@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { ListeningIntenseConversation, ListeningIntenseSentence } from '../types';
 import { ArrowLeftIcon, PlayIcon, PauseIcon, CheckCircleIcon, RefreshIcon, ClockIcon } from './icons';
-import AudioPlayer from './AudioPlayer';
+import AudioPlayer, { AudioPlayerHandle } from './AudioPlayer';
 
 interface ListeningIntensePracticeScreenProps {
     data: ListeningIntenseConversation[];
@@ -10,18 +10,39 @@ interface ListeningIntensePracticeScreenProps {
 
 type Mode = 'mode1' | 'sentence' | 'mode3';
 
+// Helper for shuffling
+const shuffleArray = <T,>(array: T[]): T[] => {
+    const newArr = [...array];
+    for (let i = newArr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+    }
+    return newArr;
+};
+
+// Word block type for Mode 3
+interface ScrambleBlock {
+    id: string;
+    text: string;
+}
+
 const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenProps> = ({ data, onBack }) => {
     const [mode, setMode] = useState<Mode>('mode1');
     const [currentConversationIdx, setCurrentConversationIdx] = useState(0);
     const [currentSentenceIdx, setCurrentSentenceIdx] = useState(0);
     
-    // User input state: dictionary where key is sentenceId, value is array of strings (one per word)
-    const [userInputs, setUserInputs] = useState<Record<string, string[]>>({});
+    const audioPlayerRef = useRef<AudioPlayerHandle>(null);
 
-    // Mode 1 (Listen & Repeat) state: tracks revealed words
+    // --- State: Mode 1 & 2 ---
+    const [userInputs, setUserInputs] = useState<Record<string, string[]>>({});
     const [revealedWords, setRevealedWords] = useState<Record<string, boolean[]>>({});
 
-    // Mode 2 Auto-next state
+    // --- State: Mode 3 (Scramble) ---
+    const [sourceBlocks, setSourceBlocks] = useState<ScrambleBlock[]>([]);
+    const [targetBlocks, setTargetBlocks] = useState<ScrambleBlock[]>([]);
+    const [scrambleStatus, setScrambleStatus] = useState<'idle' | 'correct' | 'wrong'>('idle');
+
+    // --- State: General ---
     const [isAutoNext, setIsAutoNext] = useState(false);
     const [countdown, setCountdown] = useState<number | null>(null);
 
@@ -33,7 +54,7 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
         setCountdown(null);
     }, [currentSentenceIdx, currentConversationIdx]);
 
-    // Initialize inputs for the current sentence if not exists
+    // Initialize inputs for the current sentence if not exists (Mode 1 & 2)
     useEffect(() => {
         if (currentSentence && !userInputs[currentSentence.id]) {
             setUserInputs(prev => ({
@@ -53,11 +74,25 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
         }
     }, [currentSentence, revealedWords]);
 
+    // Initialize Scramble Data (Mode 3)
+    useEffect(() => {
+        if (currentSentence) {
+            // Split sentence into words, preserving basic structure
+            const words = currentSentence.text.split(' ');
+            const blocks: ScrambleBlock[] = words.map((word, idx) => ({
+                id: `${currentSentence.id}-${idx}-${word}`, // Unique ID for duplicates
+                text: word
+            }));
+            
+            setSourceBlocks(shuffleArray(blocks));
+            setTargetBlocks([]);
+            setScrambleStatus('idle');
+        }
+    }, [currentSentenceIdx, currentConversationIdx, currentSentence]); // Re-run when sentence changes
+
     const handleFullSentenceChange = (value: string) => {
         if (!currentSentence) return;
-        // Split by space to map to the word array structure
         const words = value.split(' ');
-        
         setUserInputs(prev => ({
             ...prev,
             [currentSentence.id]: words
@@ -89,16 +124,12 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
     }, [currentSentenceIdx, currentConversationIdx, data]);
 
     const handleReplayAudio = useCallback(() => {
-        const audioEl = document.querySelector('audio');
-        if (audioEl) {
-            audioEl.currentTime = 0;
-            audioEl.play().catch(e => console.log("Audio play failed", e));
+        if (audioPlayerRef.current) {
+            audioPlayerRef.current.replay();
         }
     }, []);
 
-    // --- Logic for Mode 2 (Sentence Practice) moved to top level to avoid conditional hook calls ---
-    
-    // Derived state for Sentence Mode
+    // --- Logic for Mode 2 (Sentence Practice) moved to top level ---
     const currentInputValue = currentSentence ? (userInputs[currentSentence.id] || []).join(' ') : '';
     
     const solvedIndices = useMemo(() => {
@@ -124,7 +155,7 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
 
     const allSolved = currentSentence && solvedIndices.size === currentSentence.words.length && currentSentence.words.length > 0;
 
-    // Auto Next Effect (Top Level)
+    // Auto Next Effect
     useEffect(() => {
         if (mode !== 'sentence') {
             setCountdown(null);
@@ -142,11 +173,8 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
                 }, 1000);
             } else if (countdown === 0) {
                 handleNext();
-                // We don't reset countdown here because the effect will re-run when sentence changes
-                // and the first useEffect will reset it to null
             }
         } else {
-             // Reset if conditions aren't met (e.g. user clears input)
              if (countdown !== null && !allSolved) {
                  setCountdown(null);
              }
@@ -155,9 +183,36 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
         return () => clearTimeout(timer);
     }, [mode, isAutoNext, allSolved, countdown, handleNext]);
 
+    // --- Logic for Mode 3 (Scramble) ---
+    const handleMoveBlock = (block: ScrambleBlock, from: 'source' | 'target') => {
+        if (scrambleStatus === 'correct') return; // Lock if correct
+
+        if (from === 'source') {
+            setSourceBlocks(prev => prev.filter(b => b.id !== block.id));
+            setTargetBlocks(prev => [...prev, block]);
+        } else {
+            setTargetBlocks(prev => prev.filter(b => b.id !== block.id));
+            setSourceBlocks(prev => [...prev, block]);
+        }
+        // Reset status to idle when user modifies answer
+        if (scrambleStatus === 'wrong') setScrambleStatus('idle');
+    };
+
+    const checkScrambleAnswer = () => {
+        if (!currentSentence) return;
+        const userSentence = targetBlocks.map(b => b.text).join(' ');
+        if (userSentence === currentSentence.text) {
+            setScrambleStatus('correct');
+        } else {
+            setScrambleStatus('wrong');
+        }
+    };
+
     // Keyboard Shortcuts
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.repeat) return;
+
             // Ctrl to Replay
             if (e.ctrlKey || e.metaKey) {
                 if (e.key === 'Control' || e.key === 'Meta') {
@@ -171,13 +226,18 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
                     e.preventDefault();
                     handleNext();
                 } else if (mode === 'sentence') {
-                    // Prevent default new line in textarea
                     e.preventDefault();
-                    // "Check" action - In this realtime app, we can highlight the score
                     const scoreEl = document.getElementById('score-display');
                     if (scoreEl) {
                         scoreEl.classList.add('scale-125', 'text-green-600');
                         setTimeout(() => scoreEl.classList.remove('scale-125', 'text-green-600'), 200);
+                    }
+                } else if (mode === 'mode3') {
+                    e.preventDefault();
+                    if (scrambleStatus === 'correct') {
+                        handleNext();
+                    } else {
+                        checkScrambleAnswer();
                     }
                 }
             }
@@ -185,7 +245,7 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [mode, handleNext, handleReplayAudio]);
+    }, [mode, handleNext, handleReplayAudio, scrambleStatus, targetBlocks]); // Added dependencies for Mode 3
 
 
     // Mode 1 Helpers
@@ -244,7 +304,7 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
                         <div className="grid grid-cols-5 gap-2 px-2">
                             {conv.sentences.map((sent, sIdx) => {
                                 const isActive = cIdx === currentConversationIdx && sIdx === currentSentenceIdx;
-                                // For sidebar completion status
+                                // For sidebar completion status - simple check if they touched it
                                 const hasInput = (userInputs[sent.id] || []).join('').length > 0;
 
                                 return (
@@ -290,7 +350,7 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
                     onClick={() => setMode('mode3')}
                     className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${mode === 'mode3' ? 'bg-white dark:bg-slate-600 shadow text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
                 >
-                    Mode 3
+                    Sắp xếp lại câu
                 </button>
             </div>
         </div>
@@ -327,7 +387,7 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
                         {/* Audio Player */}
                         <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-2xl border border-blue-100 dark:border-blue-800">
                              <h3 className="text-center font-bold text-slate-700 dark:text-slate-200 mb-4">Nghe, lặp lại và check</h3>
-                             <AudioPlayer audioScript={currentSentence.text} />
+                             <AudioPlayer ref={audioPlayerRef} audioScript={currentSentence.text} />
                         </div>
 
                         {/* Interactive Area */}
@@ -388,7 +448,7 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
                         {/* Audio Player */}
                         <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-2xl border border-blue-100 dark:border-blue-800">
                              <h3 className="text-center font-bold text-slate-700 dark:text-slate-200 mb-4">Nghe và chép lại (Từ khóa)</h3>
-                             <AudioPlayer audioScript={currentSentence.text} />
+                             <AudioPlayer ref={audioPlayerRef} audioScript={currentSentence.text} />
                         </div>
 
                         {/* Blocks Display & Input Area */}
@@ -467,6 +527,102 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
         );
     };
 
+    const renderSentenceScramble = () => {
+        if (!currentSentence) return <div className="p-8 text-center text-slate-500">Select a sentence to begin practice.</div>;
+
+        return (
+            <div className="flex flex-col h-full">
+                <div className="flex-grow p-4 md:p-8 overflow-y-auto">
+                    <div className="max-w-3xl mx-auto space-y-8">
+                        {/* Audio Player */}
+                        <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-2xl border border-blue-100 dark:border-blue-800">
+                             <h3 className="text-center font-bold text-slate-700 dark:text-slate-200 mb-4">Nghe và sắp xếp lại câu</h3>
+                             <AudioPlayer ref={audioPlayerRef} audioScript={currentSentence.text} />
+                        </div>
+
+                        {/* Interactive Area */}
+                        <div className="space-y-6">
+                            
+                            {/* Target Drop Zone */}
+                            <div className={`min-h-[80px] p-6 rounded-2xl border-2 transition-all duration-300 flex flex-wrap gap-3 items-center content-center ${
+                                scrambleStatus === 'correct' 
+                                    ? 'bg-green-50 border-green-400 dark:bg-green-900/30 dark:border-green-600' 
+                                    : scrambleStatus === 'wrong'
+                                        ? 'bg-red-50 border-red-400 dark:bg-red-900/30 dark:border-red-600'
+                                        : 'bg-white border-dashed border-slate-300 dark:bg-slate-800 dark:border-slate-600'
+                            }`}>
+                                {targetBlocks.length === 0 && scrambleStatus === 'idle' && (
+                                    <span className="text-slate-400 italic w-full text-center pointer-events-none select-none">
+                                        Click words below to build the sentence...
+                                    </span>
+                                )}
+                                {targetBlocks.map((block) => (
+                                    <button
+                                        key={block.id}
+                                        onClick={() => handleMoveBlock(block, 'target')}
+                                        className="bg-white dark:bg-slate-700 text-slate-800 dark:text-white px-3 py-2 rounded-lg shadow-sm border border-slate-200 dark:border-slate-600 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-200 dark:hover:border-red-800 transition-all font-medium text-lg animate-in fade-in zoom-in-95 duration-200"
+                                    >
+                                        {block.text}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Status Message */}
+                            <div className="h-8 text-center">
+                                {scrambleStatus === 'correct' && <span className="text-green-600 font-bold text-lg animate-bounce inline-block">Correct! Excellent job.</span>}
+                                {scrambleStatus === 'wrong' && <span className="text-red-600 font-bold text-lg animate-shake inline-block">Incorrect. Try again.</span>}
+                            </div>
+
+                            {/* Source Word Bank */}
+                            <div className="bg-slate-100 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-wrap gap-3 justify-center min-h-[100px] content-start">
+                                {sourceBlocks.map((block) => (
+                                    <button
+                                        key={block.id}
+                                        onClick={() => handleMoveBlock(block, 'source')}
+                                        className="bg-white dark:bg-slate-700 text-slate-800 dark:text-white px-3 py-2 rounded-lg shadow-sm border border-slate-200 dark:border-slate-600 hover:shadow-md hover:-translate-y-0.5 hover:border-blue-300 dark:hover:border-blue-500 transition-all font-medium text-lg cursor-pointer"
+                                    >
+                                        {block.text}
+                                    </button>
+                                ))}
+                                {sourceBlocks.length === 0 && (
+                                    <span className="text-slate-400 italic">All words placed.</span>
+                                )}
+                            </div>
+
+                            {/* Controls */}
+                            <div className="flex justify-center pt-4">
+                                {scrambleStatus === 'correct' ? (
+                                    <button 
+                                        onClick={handleNext} 
+                                        className="px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-lg transition-all transform hover:scale-105"
+                                    >
+                                        Next Sentence
+                                    </button>
+                                ) : (
+                                    <button 
+                                        onClick={checkScrambleAnswer} 
+                                        disabled={targetBlocks.length === 0}
+                                        className="px-8 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 shadow-lg transition-all transform hover:scale-105 disabled:bg-slate-300 disabled:shadow-none disabled:cursor-not-allowed"
+                                    >
+                                        Check Answer
+                                    </button>
+                                )}
+                            </div>
+                            
+                            {/* Shortcuts Guide */}
+                             <div className="mt-6 flex justify-center gap-6 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                                <span className="flex items-center"><span className="border border-slate-300 px-1.5 py-0.5 rounded mx-1">Ctrl</span> - Phát lại</span>
+                                <span className="flex items-center"><span className="border border-slate-300 px-1.5 py-0.5 rounded mx-1">Enter</span> - {scrambleStatus === 'correct' ? 'Next' : 'Check'}</span>
+                             </div>
+
+                        </div>
+                        {renderNavigation()}
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div className="flex flex-col md:flex-row h-screen bg-slate-50 dark:bg-slate-900 overflow-hidden">
             {renderLeftSidebar()}
@@ -475,11 +631,7 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
                 <div className="flex-1 overflow-hidden relative">
                     {mode === 'sentence' && renderSentencePractice()}
                     {mode === 'mode1' && renderListenRepeat()}
-                    {mode === 'mode3' && (
-                        <div className="flex items-center justify-center h-full text-slate-400 font-medium">
-                            Mode 3 content coming soon.
-                        </div>
-                    )}
+                    {mode === 'mode3' && renderSentenceScramble()}
                 </div>
             </div>
              {/* Mobile View Placeholder */}
@@ -488,11 +640,7 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
                  <div className="flex-1 overflow-hidden relative">
                      {mode === 'sentence' && renderSentencePractice()}
                      {mode === 'mode1' && renderListenRepeat()}
-                     {mode === 'mode3' && (
-                        <div className="flex items-center justify-center h-full text-slate-400 font-medium">
-                            Mode 3 content coming soon.
-                        </div>
-                    )}
+                     {mode === 'mode3' && renderSentenceScramble()}
                  </div>
              </div>
         </div>

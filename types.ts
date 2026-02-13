@@ -19,6 +19,7 @@ export enum AppState {
     ListeningIntenseHub = 'LISTENING_INTENSE_HUB',
     ListeningIntensePractice = 'LISTENING_INTENSE_PRACTICE',
     Login = 'LOGIN',
+    Guide = 'GUIDE',
 }
 
 // For Listening & Translation (within Vocabulary)

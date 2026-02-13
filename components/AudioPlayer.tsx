@@ -1,5 +1,9 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo, useImperativeHandle, forwardRef } from 'react';
 import { PlayIcon, PauseIcon, LinkIcon, PlusIcon, MinusIcon } from './icons';
+
+export interface AudioPlayerHandle {
+    replay: () => void;
+}
 
 interface AudioPlayerProps {
     audioScript?: string;
@@ -12,7 +16,7 @@ const isGoogleDriveId = (id: string | undefined): id is string => {
     return !!id && !id.includes('/') && !id.startsWith('http') && id.length >= 25;
 };
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc, autoPlay = false }) => {
+const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(({ audioScript, audioSrc, autoPlay = false }, ref) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [hasError, setHasError] = useState(false);
     const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
@@ -23,12 +27,57 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc, autoPl
 
     const audioRef = useRef<HTMLAudioElement>(null);
     const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
-    const isPlayingRef = useRef(isPlaying);
-    isPlayingRef.current = isPlaying;
     
     const lastSpokenScriptRef = useRef<string | null>(null);
 
     const driveMode = useMemo(() => isGoogleDriveId(audioSrc), [audioSrc]);
+
+    // Helper to play TTS with current settings
+    const playTTS = useCallback((text: string) => {
+        const synth = window.speechSynthesis;
+        // Cancel any ongoing speech
+        synth.cancel();
+
+        const u = new SpeechSynthesisUtterance(text);
+        
+        // Apply current voice
+        if (voices.length > 0) {
+            const selectedVoice = voices.find(v => v.voiceURI === selectedVoiceURI);
+            if (selectedVoice) {
+                u.voice = selectedVoice;
+            } else {
+                 // Fallback to the first available if selected isn't found (shouldn't happen often)
+                 u.voice = voices[0];
+            }
+        }
+        
+        // Apply current rate
+        u.rate = speechRate;
+        
+        u.onend = () => setIsPlaying(false);
+        u.onstart = () => setIsPlaying(true);
+        u.onerror = () => setIsPlaying(false);
+
+        utteranceRef.current = u;
+        synth.speak(u);
+    }, [voices, selectedVoiceURI, speechRate]);
+
+    // Expose replay method to parent
+    useImperativeHandle(ref, () => ({
+        replay: () => {
+            if (driveMode) return; 
+
+            if (audioSrc && audioRef.current) {
+                const audio = audioRef.current;
+                audio.currentTime = 0;
+                audio.play().catch(() => setIsPlaying(false));
+                setIsPlaying(true);
+            } else if (audioScript) {
+                // Re-create the utterance to ensure it plays (browsers sometimes fail to replay the same instance)
+                playTTS(audioScript);
+            }
+        }
+    }));
 
     // Effect for loading system voices and settings for TTS
     useEffect(() => {
@@ -55,7 +104,10 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc, autoPl
                                    availableVoices[0];
                 }
                 
-                setSelectedVoiceURI(initialVoice?.voiceURI || null);
+                // Only set if we don't have one or if we are initializing
+                if (!selectedVoiceURI) {
+                    setSelectedVoiceURI(initialVoice?.voiceURI || null);
+                }
             }
             const savedRate = localStorage.getItem('tts-rate');
             if (savedRate) {
@@ -69,7 +121,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc, autoPl
         return () => {
             window.speechSynthesis.removeEventListener('voiceschanged', loadVoicesAndSettings);
         };
-    }, [driveMode]);
+    }, [driveMode, selectedVoiceURI]); // Added selectedVoiceURI dependency to avoid overwriting user selection
 
     // Handle voice change
     const handleVoiceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -93,7 +145,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc, autoPl
         }
     }, [speechRate]);
 
-    // Effect for preparing the TTS utterance
+    // Effect for preparing/playing the TTS utterance automatically on change
     useEffect(() => {
         if (driveMode || !audioScript) {
             window.speechSynthesis.cancel();
@@ -101,38 +153,26 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc, autoPl
             return;
         }
 
-        const synth = window.speechSynthesis;
-        const u = new SpeechSynthesisUtterance(audioScript);
-        
-        if (voices.length > 0) {
-            const selectedVoice = voices.find(v => v.voiceURI === selectedVoiceURI);
-            if (selectedVoice) {
-                u.voice = selectedVoice;
-            }
-        }
-        
-        u.rate = speechRate;
-        u.onend = () => setIsPlaying(false);
-        u.onstart = () => setIsPlaying(true);
-        u.onerror = () => setIsPlaying(false);
-        utteranceRef.current = u;
-
         // Automatically play ONLY IF autoPlay is enabled AND this script hasn't been spoken yet
         if (autoPlay && lastSpokenScriptRef.current !== audioScript) {
-            synth.cancel();
-            // Small delay to ensure clean start especially on mobile/chrome
-            setTimeout(() => {
-                synth.speak(u);
+            // Use a small timeout to ensure voices are loaded and previous audio is cleared
+            const timer = setTimeout(() => {
+                playTTS(audioScript);
                 lastSpokenScriptRef.current = audioScript;
             }, 100);
+            return () => clearTimeout(timer);
         }
 
+        // We don't pre-create the utterance here anymore to avoid stale closures.
+        // playTTS will create it on demand or when auto-play triggers.
+
         return () => {
-            if (synth.speaking) {
-                synth.cancel();
-            }
+             // Cleanup on unmount or script change
+             if (window.speechSynthesis.speaking) {
+                 window.speechSynthesis.cancel();
+             }
         };
-    }, [audioScript, selectedVoiceURI, voices, speechRate, driveMode, autoPlay]);
+    }, [audioScript, driveMode, autoPlay, playTTS]); 
 
     // Effect for handling standard <audio> element events
     useEffect(() => {
@@ -180,7 +220,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc, autoPl
                 audio.removeEventListener('canplaythrough', onCanPlayThrough);
             }
         };
-    }, [audioSrc, driveMode, autoPlay]); // Removed speechRate from deps to avoid re-binding listeners
+    }, [audioSrc, driveMode, autoPlay, speechRate]); 
     
     // Global cleanup
     useEffect(() => {
@@ -200,18 +240,16 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc, autoPl
             } else {
                 audio.play().catch(() => setIsPlaying(false));
             }
-        } else if (audioScript && utteranceRef.current) {
+        } else if (audioScript) {
             const synth = window.speechSynthesis;
             if (isPlaying) {
                 synth.cancel();
                 setIsPlaying(false);
             } else {
-                synth.cancel();
-                synth.speak(utteranceRef.current);
-                setIsPlaying(true);
+                playTTS(audioScript);
             }
         }
-    }, [isPlaying, driveMode, hasError, audioScript, audioSrc]);
+    }, [isPlaying, driveMode, hasError, audioScript, audioSrc, playTTS]);
     
     const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (audioRef.current) {
@@ -332,6 +370,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioScript, audioSrc, autoPl
             </div>
         </div>
     );
-};
+});
 
 export default AudioPlayer;

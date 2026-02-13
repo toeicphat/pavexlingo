@@ -11,6 +11,7 @@ import GrammarScreen from './components/GrammarScreen';
 import GrammarTopicScreen from './components/GrammarTopicScreen';
 import TestScreen from './components/TestScreen';
 import LoginScreen from './components/LoginScreen';
+import GuideScreen from './components/GuideScreen';
 import ListeningIntenseScreen from './components/ListeningIntenseScreen';
 import ListeningIntensePracticeScreen from './components/ListeningIntensePracticeScreen';
 import { AppState, VocabularyTest, VocabularyPart, User, DictationMode, TestData, UserAnswers } from './types';
@@ -85,6 +86,10 @@ const App: React.FC = () => {
       setCurrentUser(null);
       handleGoHome();
   }, [handleGoHome]);
+
+  const handleNavigateToGuide = useCallback(() => {
+      setAppState(AppState.Guide);
+  }, []);
 
   // Vocabulary Navigation Handlers
   const handleSelectVocabularyPart = useCallback((partId: number) => {
@@ -228,6 +233,8 @@ const App: React.FC = () => {
                 return <PracticeHub {...practiceHubProps} />;
             case AppState.Login:
                 return <LoginScreen onLoginSuccess={handleLoginSuccess} users={mockUsers} />;
+            case AppState.Guide:
+                return <GuideScreen onBack={handleGoHome} />;
             case AppState.VocabularyHome:
                 return (
                     <VocabularyScreen 
@@ -266,7 +273,8 @@ const App: React.FC = () => {
             case AppState.GrammarHub:
                 if (!currentUser) return <PracticeHub {...practiceHubProps} />;
                 return (
-                    <GrammarScreen onSelectTopic={handleSelectGrammarTopic} onStartRandomTest={handleStartGrammarRandomTest} />)
+                    <GrammarScreen onSelectTopic={handleSelectGrammarTopic} onStartRandomTest={handleStartGrammarRandomTest} />
+                );
             case AppState.GrammarTopic:
                 if (!selectedGrammarTopic) return null;
                 return <GrammarTopicScreen topic={selectedGrammarTopic} onBack={handleBackToGrammarHub} />;
@@ -304,6 +312,12 @@ const App: React.FC = () => {
                         <span className="text-xl font-bold text-slate-800 dark:text-slate-100">Pavex Lingo</span>
                     </div>
                     <div className="flex items-center gap-4">
+                        <button 
+                            onClick={handleNavigateToGuide}
+                            className="px-4 py-2 text-sm font-bold text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors"
+                        >
+                            Hướng dẫn
+                        </button>
                         {currentUser ? (
                             <div className="flex items-center gap-3">
                                 <span className="text-sm font-medium text-slate-600 dark:text-slate-300 hidden sm:inline">Xin chào, <span className="text-blue-600 font-bold">{currentUser.username}</span></span>
