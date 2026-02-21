@@ -1,5 +1,5 @@
-import React from 'react';
-import { SectionVocabIcon, SectionDictationIcon, SectionGrammarIcon, MoneyEmojiIcon, SparklesIcon, TargetFillIcon, HeadphoneIcon } from './icons';
+import React, { useState, useEffect } from 'react';
+import { SectionVocabIcon, SectionDictationIcon, SectionGrammarIcon, MoneyEmojiIcon, SparklesIcon, TargetFillIcon, HeadphoneIcon, MegaphoneIcon, XCircleIcon } from './icons';
 
 interface PracticeHubProps {
   onNavigateToVocabulary: () => void;
@@ -8,6 +8,12 @@ interface PracticeHubProps {
   onNavigateToListeningIntense: () => void;
   isLoggedIn: boolean;
 }
+
+const announcements = [
+  { date: '13/02/2026', time: '09:00', text: 'Đã có tính năng hướng dẫn sử dụng Website ở góc phải phía trên.' },
+  { date: '01/02/2026', time: '14:30', text: 'Cập nhật tính năng Luyện Nghe (Chuyên sâu).' },
+  { date: '15/01/2026', time: '10:15', text: 'Cập nhật tính năng Tạo từ vựng cá nhân trong mục Từ vựng.' },
+];
 
 const PracticeCard: React.FC<{
     title: string, 
@@ -49,8 +55,73 @@ const PracticeHub: React.FC<PracticeHubProps> = ({
     onNavigateToListeningIntense,
     isLoggedIn
 }) => {
+  const [showAnnouncements, setShowAnnouncements] = useState(false);
+
+  useEffect(() => {
+    const hasSeenAnnouncements = sessionStorage.getItem('pavex_seen_announcements');
+    if (!hasSeenAnnouncements) {
+      setShowAnnouncements(true);
+      sessionStorage.setItem('pavex_seen_announcements', 'true');
+    }
+  }, []);
+
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-4 py-12 relative">
+      {/* Floating Announcement Button */}
+      <button 
+        onClick={() => setShowAnnouncements(!showAnnouncements)}
+        className="fixed left-6 bottom-24 z-40 p-4 bg-blue-600 text-white rounded-full shadow-2xl hover:bg-blue-700 transition-all hover:scale-110 active:scale-95 group"
+        aria-label="Xem thông báo"
+      >
+        <MegaphoneIcon className="h-8 w-8" />
+        {!showAnnouncements && (
+            <span className="absolute left-full ml-3 px-3 py-1 bg-slate-800 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            Cập nhật mới
+            </span>
+        )}
+      </button>
+
+      {/* Announcement Pop-up (Non-modal) */}
+      {showAnnouncements && (
+        <div className="fixed left-28 bottom-24 z-50 w-80 sm:w-96 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 transform animate-in slide-in-from-bottom-5 duration-200 origin-bottom-left flex flex-col max-h-[60vh]">
+            {/* Header */}
+            <div className="flex justify-between items-center p-4 border-b border-slate-100 dark:border-slate-700">
+                <div className="flex items-center gap-2">
+                    <MegaphoneIcon className="h-5 w-5 text-blue-600" />
+                    <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">Cập nhật mới</h3>
+                </div>
+                <button 
+                    onClick={() => setShowAnnouncements(false)} 
+                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors"
+                >
+                    <XCircleIcon className="h-6 w-6" />
+                </button>
+            </div>
+            
+            {/* Content */}
+            <div className="overflow-y-auto p-4 space-y-3">
+                 {announcements.map((ann, idx) => (
+                      <div key={idx} className="pb-3 border-b border-slate-100 dark:border-slate-700 last:border-0">
+                        <div className="flex items-center justify-between mb-1">
+                             <span className="text-[10px] font-bold text-blue-600 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded uppercase tracking-wider">{ann.date}</span>
+                             <span className="text-[10px] text-slate-400 font-medium">{ann.time}</span>
+                        </div>
+                        <p className="text-sm text-slate-700 dark:text-slate-300 font-medium leading-relaxed">{ann.text}</p>
+                      </div>
+                 ))}
+            </div>
+            
+             <div className="p-3 border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30 rounded-b-2xl">
+                <button 
+                  onClick={() => setShowAnnouncements(false)}
+                  className="w-full py-2 rounded-lg font-bold text-sm text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+                >
+                  Đóng
+                </button>
+            </div>
+        </div>
+      )}
+
       <div className="max-w-4xl mx-auto text-center mb-12 flex flex-col items-center">
         <div className="flex items-center gap-4 mb-4 animate-bling">
           <TargetFillIcon className="h-20 w-20" />
@@ -96,7 +167,6 @@ const PracticeHub: React.FC<PracticeHubProps> = ({
       </div>
 
       <div className="mt-16 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Left Column: Golden Note */}
         <div className="relative overflow-hidden p-8 rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-400 to-amber-500 border-2 border-yellow-200/50 shadow-xl shadow-yellow-500/10 shine flex flex-col justify-center">
             <div className="relative text-red-900 space-y-4 font-medium">
                 <p>
@@ -108,7 +178,6 @@ const PracticeHub: React.FC<PracticeHubProps> = ({
             </div>
         </div>
 
-        {/* Right Column: Reward Activity Note */}
         <div className="relative overflow-hidden p-8 rounded-2xl bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-400 shadow-xl shadow-blue-500/10 shine flex flex-col items-center text-center">
             <div className="absolute top-2 left-2 text-blue-300/40 dark:text-blue-400/20">
                 <SparklesIcon className="h-10 w-10 rotate-12" />
@@ -136,7 +205,6 @@ const PracticeHub: React.FC<PracticeHubProps> = ({
             </a>
         </div>
       </div>
-
     </div>
   );
 };
