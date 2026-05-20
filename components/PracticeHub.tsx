@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SectionVocabIcon, SectionDictationIcon, SectionGrammarIcon, MoneyEmojiIcon, SparklesIcon, TargetFillIcon, HeadphoneIcon, MegaphoneIcon, XCircleIcon } from './icons';
+import { SectionVocabIcon, SectionDictationIcon, SectionGrammarIcon, MoneyEmojiIcon, SparklesIcon, TargetFillIcon, HeadphoneIcon, MegaphoneIcon, XCircleIcon, ListeningIntenseIcon } from './icons';
 
 interface PracticeHubProps {
   onNavigateToVocabulary: () => void;
@@ -10,6 +10,7 @@ interface PracticeHubProps {
 }
 
 const announcements = [
+  { date: '21/02/2026', time: '09:00', text: 'Đã cập nhật bộ từ vựng mới của bộ Từ Vựng Reading 2026' },
   { date: '13/02/2026', time: '09:00', text: 'Đã có tính năng hướng dẫn sử dụng Website ở góc phải phía trên.' },
   { date: '01/02/2026', time: '14:30', text: 'Cập nhật tính năng Luyện Nghe (Chuyên sâu).' },
   { date: '15/01/2026', time: '10:15', text: 'Cập nhật tính năng Tạo từ vựng cá nhân trong mục Từ vựng.' },
@@ -160,7 +161,7 @@ const PracticeHub: React.FC<PracticeHubProps> = ({
             title="Listening (Chuyên sâu)"
             description="Luyện tập nghe hiểu theo hình thức chuyên sâu."
             onClick={onNavigateToListeningIntense}
-            icon={HeadphoneIcon}
+            icon={ListeningIntenseIcon}
             iconColor="text-blue-600"
             faded={!isLoggedIn}
         />

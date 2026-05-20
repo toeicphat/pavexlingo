@@ -9,6 +9,7 @@ import { readingComprehensiveVocabulary } from './vocabulary/readingVoca';
 import { reading2026Vocabulary } from './vocabulary/reading2026Vocabulary';
 import { readingPart7IntenseVocabularyData } from './vocabulary/readingPart7IntenseVocabulary';
 import { readingBasic2026Vocabulary } from './vocabulary/readingBasic2026Vocabulary';
+import { medicalEnglishVocabulary } from './vocabulary/medicalEnglishVocabulary';
 
 let allWordsCache: string[] | null = null;
 
@@ -23,6 +24,7 @@ export const vocabularyData: VocabularyPart[] = [
     reading2026Vocabulary,
     readingBasic2026Vocabulary,
     readingPart7IntenseVocabularyData,
+    medicalEnglishVocabulary,
 ];
 
 export const getVocabularyPart = (partId: number): VocabularyPart | null => {
