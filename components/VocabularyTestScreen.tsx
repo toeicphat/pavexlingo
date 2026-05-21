@@ -556,6 +556,7 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
                     >
                         <div className="absolute w-full h-full bg-white rounded-xl flex items-center justify-center p-6 text-center" style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}>
                             <h3 className="text-4xl font-bold text-slate-800">{currentWord.word}</h3>
+                            {currentWord.ipa && <p className="text-xl text-slate-500 mt-2 font-mono">{currentWord.ipa}</p>}
                         </div>
                         <div className="absolute w-full h-full bg-slate-100 rounded-xl flex flex-col items-center justify-center p-6 text-center" style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
                             <p className="text-xl text-slate-700">{currentWord.definition}</p>
@@ -675,6 +676,7 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
                                 className={buttonClasses}
                             >
                                 <span className="text-xl mb-1">{option.word}</span>
+                                {option.ipa && <span className="text-sm font-mono mb-1">{option.ipa}</span>}
                                 <span className="text-xs opacity-75 font-normal">({option.definition})</span>
                             </button>
                         );
@@ -763,7 +765,12 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
 
                         return (
                             <button key={index} onClick={() => handleMatchingItemSelect(gridItem)} className={buttonClasses} disabled={isMatched}>
-                                {gridItem.type === 'word' ? gridItem.item.word : gridItem.item.definition}
+                                {gridItem.type === 'word' ? (
+                                    <div className="flex flex-col items-center">
+                                        <span>{gridItem.item.word}</span>
+                                        {gridItem.item.ipa && <span className="text-xs mt-1 opacity-70 font-mono font-normal">{gridItem.item.ipa}</span>}
+                                    </div>
+                                ) : gridItem.item.definition}
                             </button>
                         );
                     })}
@@ -785,6 +792,7 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
                 <div className="p-6 bg-slate-100 rounded-lg text-center">
                     <p className="text-sm text-slate-500 mb-2">Unscramble the word for:</p>
                     <p className="text-base text-slate-700 font-medium">"{currentQuestion.original.definition}"</p>
+                    {currentQuestion.original.ipa && <p className="text-sm font-mono text-slate-500 mt-1">{currentQuestion.original.ipa}</p>}
                 </div>
                 <div className="mt-6 text-center">
                     <p className="text-4xl font-bold tracking-widest text-blue-600 my-4 p-4 bg-blue-50 rounded-lg">{currentQuestion.scrambled}</p>
@@ -801,7 +809,10 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
                             placeholder="Type your answer"
                         />
                          {currentQuestion.isCorrect === false && (
-                            <p className="text-green-600 font-semibold mt-2">Correct answer: {currentQuestion.original.word}</p>
+                            <div className="mt-2 text-center">
+                                <p className="text-green-600 font-semibold">Correct answer: {currentQuestion.original.word}</p>
+                                {currentQuestion.original.ipa && <p className="text-sm font-mono text-green-700 opacity-80">{currentQuestion.original.ipa}</p>}
+                            </div>
                         )}
                          {currentQuestion.isCorrect === null && (
                             <div className="mt-4 flex gap-2 justify-center">
@@ -836,8 +847,9 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
                     <h3 className="text-xl font-bold text-slate-800">Spelling Recall</h3>
                     <span className="font-semibold text-slate-500">{currentSpellingIndex + 1} / {spellingQuestions.length}</span>
                 </div>
-                 <div className="p-6 bg-slate-100 rounded-lg text-center min-h-[100px] flex items-center justify-center">
+                 <div className="p-6 bg-slate-100 rounded-lg text-center min-h-[100px] flex flex-col items-center justify-center">
                     <p className="text-base text-slate-700 font-medium">"{currentQuestion.original.definition}"</p>
+                    {currentQuestion.original.ipa && <p className="text-sm font-mono text-slate-500 mt-2">{currentQuestion.original.ipa}</p>}
                 </div>
                 <div className="mt-6 text-center">
                     <p className="text-2xl font-bold tracking-[0.5em] text-blue-600 my-4 p-2 bg-blue-50 rounded-lg uppercase">{revealedWord}</p>
@@ -855,7 +867,10 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
                             autoCapitalize="none"
                         />
                          {currentQuestion.isCorrect === false && (
-                            <p className="text-green-600 font-semibold mt-2">Correct answer: {currentQuestion.original.word}</p>
+                            <div className="mt-2 text-center">
+                                <p className="text-green-600 font-semibold">Correct answer: {currentQuestion.original.word}</p>
+                                {currentQuestion.original.ipa && <p className="text-sm font-mono text-green-700 opacity-80">{currentQuestion.original.ipa}</p>}
+                            </div>
                         )}
                          {currentQuestion.isCorrect === null && (
                              <div className="mt-4 flex gap-2 justify-center">
@@ -895,8 +910,9 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
                 </div>
 
                 {currentQuestion.meaningRevealed && (
-                    <div className="mt-4 p-4 bg-yellow-50 rounded-lg text-center">
+                    <div className="mt-4 p-4 bg-yellow-50 rounded-lg text-center flex flex-col justify-center items-center">
                         <p className="text-sm text-yellow-700 font-semibold">Hint (Meaning): "{currentQuestion.original.definition}"</p>
+                        {currentQuestion.original.ipa && <p className="text-xs font-mono text-yellow-700 opacity-80 mt-1">{currentQuestion.original.ipa}</p>}
                     </div>
                 )}
                 
@@ -915,7 +931,10 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
                             autoCapitalize="none"
                         />
                          {currentQuestion.isCorrect === false && (
-                            <p className="text-green-600 font-semibold mt-2">Correct answer: {currentQuestion.original.word}</p>
+                            <div className="mt-2 text-center">
+                                <p className="text-green-600 font-semibold">Correct answer: {currentQuestion.original.word}</p>
+                                {currentQuestion.original.ipa && <p className="text-sm font-mono text-green-700 opacity-80">{currentQuestion.original.ipa}</p>}
+                            </div>
                         )}
                          {currentQuestion.isCorrect === null && (
                              <div className="mt-4 flex gap-2 justify-center">
@@ -980,7 +999,14 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
                              else if (isSelected) classes += "bg-blue-200 border-blue-500 ring-2 ring-blue-300";
                              else classes += "bg-white border-slate-300 hover:bg-blue-50 hover:border-blue-400 cursor-pointer";
 
-                            return <button key={`word-${index}`} onClick={() => handleDMatchWordClick(wordItem)} className={classes} disabled={isCorrect}>{wordItem.item.word}</button>;
+                            return (
+                                <button key={`word-${index}`} onClick={() => handleDMatchWordClick(wordItem)} className={classes} disabled={isCorrect}>
+                                    <div className="flex flex-col w-full text-left">
+                                        <span>{wordItem.item.word}</span>
+                                        {wordItem.item.ipa && <span className="text-xs font-mono opacity-70 font-normal mt-0.5">{wordItem.item.ipa}</span>}
+                                    </div>
+                                </button>
+                            );
                         })}
                     </div>
                     <div className="space-y-3">

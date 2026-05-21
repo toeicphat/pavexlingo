@@ -314,6 +314,7 @@ const VocabularyScreen: React.FC<VocabularyScreenProps> = ({ onSelectPart, onSta
 
                 <div className="relative bg-white rounded-xl shadow-2xl border border-slate-200 p-8 min-h-[350px] flex flex-col items-center justify-center text-center transition-all duration-500">
                    <h3 className="text-5xl font-bold text-slate-800 tracking-tight">{currentWord.word}</h3>
+                   {currentWord.ipa && <p className="text-xl text-slate-500 font-mono mt-2">{currentWord.ipa}</p>}
                    
                    {isDefinitionVisible && (
                        <div className="mt-6 w-full animate-fade-in">
@@ -360,6 +361,7 @@ const VocabularyScreen: React.FC<VocabularyScreenProps> = ({ onSelectPart, onSta
                         <li key={word.id} className="p-4 md:p-6 flex justify-between items-start hover:bg-slate-50">
                             <div>
                                 <h4 className="text-lg font-bold text-slate-800">{word.word}</h4>
+                                {word.ipa && <p className="text-sm text-slate-500 font-mono mt-0.5">{word.ipa}</p>}
                                 <p className="text-slate-600 mt-1">{word.definition}</p>
                                 <p className="text-xs text-slate-400 mt-2">
                                     Next Review: {new Date(word.nextReviewDate).toLocaleDateString()} (Level {word.srsLevel})

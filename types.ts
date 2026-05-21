@@ -37,13 +37,15 @@ export interface VocabularyWord {
     nextReviewDate: number; // timestamp
     lastReviewedDate: number | null; // timestamp
     sourceText?: string; // a sentence where the word was found
+    ipa?: string;
 }
 
 // For Pre-defined Vocabulary Lists
 export interface VocabItem {
     word: string;
     definition: string;
-    example: string;
+    example?: string;
+    ipa?: string;
 }
 
 export interface VocabularyTest {

@@ -89,6 +89,7 @@ export const mockFetch = async (url: RequestInfo | URL, config?: RequestInit): P
                 id: wordId,
                 word: wordDetails.word,
                 definition: wordDetails.definition,
+                ipa: wordDetails.ipa,
                 srsLevel: 0,
                 nextReviewDate: Date.now(),
                 lastReviewedDate: null,
