@@ -8,7 +8,7 @@ interface ListeningIntensePracticeScreenProps {
     onBack: () => void;
 }
 
-type Mode = 'mode1' | 'sentence' | 'mode3';
+type Mode = 'mode1' | 'sentence' | 'sentence_advanced' | 'mode3';
 
 // Helper for shuffling
 const shuffleArray = <T,>(array: T[]): T[] => {
@@ -104,15 +104,39 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
         setCurrentSentenceIdx(sentIndex);
     };
 
+    const getRandomSentence = useCallback(() => {
+        const availableTotal = data.reduce((acc, conv) => acc + conv.sentences.length, 0);
+        if (availableTotal === 0) return;
+        const randomGlobalIdx = Math.floor(Math.random() * availableTotal);
+        
+        let current = 0;
+        for (let cIdx = 0; cIdx < data.length; cIdx++) {
+            const sentencesInConv = data[cIdx].sentences;
+            if (randomGlobalIdx < current + sentencesInConv.length) {
+                const sIdx = randomGlobalIdx - current;
+                setCurrentConversationIdx(cIdx);
+                setCurrentSentenceIdx(sIdx);
+                break;
+            }
+            current += sentencesInConv.length;
+        }
+    }, [data]);
+
     const handleNext = useCallback(() => {
         if (!currentConversation) return;
+
+        if (mode === 'sentence_advanced') {
+            getRandomSentence();
+            return;
+        }
+
         if (currentSentenceIdx < currentConversation.sentences.length - 1) {
             setCurrentSentenceIdx(prev => prev + 1);
         } else if (currentConversationIdx < data.length - 1) {
             setCurrentConversationIdx(prev => prev + 1);
             setCurrentSentenceIdx(0);
         }
-    }, [currentConversation, currentSentenceIdx, currentConversationIdx, data.length]);
+    }, [currentConversation, currentSentenceIdx, currentConversationIdx, data.length, mode, getRandomSentence]);
 
     const handlePrev = useCallback(() => {
         if (currentSentenceIdx > 0) {
@@ -157,7 +181,7 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
 
     // Auto Next Effect
     useEffect(() => {
-        if (mode !== 'sentence') {
+        if (mode !== 'sentence' && mode !== 'sentence_advanced') {
             setCountdown(null);
             return;
         }
@@ -225,12 +249,18 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
                 if (mode === 'mode1') {
                     e.preventDefault();
                     handleNext();
-                } else if (mode === 'sentence') {
+                } else if (mode === 'sentence' || mode === 'sentence_advanced') {
                     e.preventDefault();
-                    const scoreEl = document.getElementById('score-display');
-                    if (scoreEl) {
-                        scoreEl.classList.add('scale-125', 'text-green-600');
-                        setTimeout(() => scoreEl.classList.remove('scale-125', 'text-green-600'), 200);
+                    if (mode === 'sentence_advanced' && allSolved) {
+                        handleNext();
+                    } else if (mode === 'sentence' && allSolved) {
+                        handleNext();
+                    } else {
+                        const scoreEl = document.getElementById('score-display');
+                        if (scoreEl) {
+                            scoreEl.classList.add('scale-125', 'text-green-600');
+                            setTimeout(() => scoreEl.classList.remove('scale-125', 'text-green-600'), 200);
+                        }
                     }
                 } else if (mode === 'mode3') {
                     e.preventDefault();
@@ -289,15 +319,15 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
     };
 
     const renderLeftSidebar = () => (
-        <div className="w-full md:w-1/3 lg:w-1/4 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 h-[calc(100vh-80px)] overflow-y-auto">
-            <div className="p-4 border-b border-slate-200 dark:border-slate-700 sticky top-0 bg-white dark:bg-slate-800 z-10">
+        <div className="w-full md:w-1/3 lg:w-1/4 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 h-[calc(100vh-80px)] flex flex-col">
+            <div className="p-4 border-b border-slate-200 dark:border-slate-700 sticky top-0 bg-white dark:bg-slate-800 z-10 shrink-0">
                 <button onClick={onBack} className="flex items-center text-slate-600 dark:text-slate-400 hover:text-blue-600 mb-4 transition-colors">
                     <ArrowLeftIcon className="h-4 w-4 mr-2" />
                     Back to Selection
                 </button>
                 <h3 className="font-bold text-lg text-slate-800 dark:text-white">Conversations</h3>
             </div>
-            <div className="p-2 space-y-4">
+            <div className={`p-2 space-y-4 overflow-y-auto flex-1 ${mode === 'sentence_advanced' ? 'opacity-50 pointer-events-none select-none' : ''}`}>
                 {data.map((conv, cIdx) => (
                     <div key={conv.id} className="mb-6">
                         <h4 className="font-bold text-xs text-slate-500 uppercase tracking-wider mb-2 px-2">{conv.title}</h4>
@@ -335,22 +365,28 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
         <div className="flex justify-center p-4 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
             <div className="bg-slate-100 dark:bg-slate-700 p-1 rounded-lg inline-flex">
                 <button 
-                    onClick={() => setMode('mode1')}
-                    className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${mode === 'mode1' ? 'bg-white dark:bg-slate-600 shadow text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
-                >
-                    Nghe & Lặp lại
-                </button>
-                <button 
-                    onClick={() => setMode('sentence')}
-                    className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${mode === 'sentence' ? 'bg-white dark:bg-slate-600 shadow text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
-                >
-                    Nghe & Chép
-                </button>
-                <button 
                     onClick={() => setMode('mode3')}
-                    className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${mode === 'mode3' ? 'bg-white dark:bg-slate-600 shadow text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+                    className={`px-4 py-2 rounded-md text-sm font-bold transition-all flex items-center justify-center gap-1 ${mode === 'mode3' ? 'bg-white dark:bg-slate-600 shadow text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
                 >
-                    Sắp xếp lại câu
+                    Sắp xếp lại câu<span className="hidden md:inline font-normal opacity-75"> (Dễ làm quen)</span>
+                </button>
+                <button 
+                    onClick={() => { setMode('sentence'); }}
+                    className={`px-4 py-2 rounded-md text-sm font-bold transition-all flex items-center justify-center gap-1 ${mode === 'sentence' ? 'bg-white dark:bg-slate-600 shadow text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+                >
+                    Nghe & Chép<span className="hidden md:inline font-normal opacity-75"> (Khuyến khích)</span>
+                </button>
+                <button 
+                    onClick={() => { setMode('sentence_advanced'); getRandomSentence(); }}
+                    className={`px-4 py-2 rounded-md text-sm font-bold transition-all flex items-center justify-center gap-1 ${mode === 'sentence_advanced' ? 'bg-white dark:bg-slate-600 shadow text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+                >
+                    Nghe & Chép (nâng cao)
+                </button>
+                <button 
+                    onClick={() => setMode('mode1')}
+                    className={`px-4 py-2 rounded-md text-sm font-bold transition-all flex items-center justify-center gap-1 ${mode === 'mode1' ? 'bg-white dark:bg-slate-600 shadow text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+                >
+                    Nghe & Lặp lại<span className="hidden md:inline font-normal opacity-75"> (Dành cho nghe tốt)</span>
                 </button>
             </div>
         </div>
@@ -360,15 +396,16 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
         <div className="flex justify-between pt-4">
             <button 
                 onClick={handlePrev}
-                disabled={currentConversationIdx === 0 && currentSentenceIdx === 0}
-                className="px-4 py-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+                disabled={currentConversationIdx === 0 && currentSentenceIdx === 0 || mode === 'sentence_advanced'}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${mode === 'sentence_advanced' ? 'opacity-0 pointer-events-none' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed'}`}
             >
                 Previous Sentence
             </button>
             <button 
                 onClick={handleNext}
-                disabled={currentConversationIdx === data.length - 1 && currentSentenceIdx === currentConversation.sentences.length - 1}
+                disabled={(mode === 'sentence_advanced' ? !allSolved : false) || (!(mode === 'sentence_advanced') && currentConversationIdx === data.length - 1 && currentSentenceIdx === currentConversation.sentences.length - 1)}
                 className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-bold shadow-md transition-colors"
+                title={mode === 'sentence_advanced' && !allSolved ? "You must complete the current sentence correctly to move on." : ""}
             >
                 Next Sentence
             </button>
@@ -629,7 +666,7 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
             <div className="flex-1 flex-col h-full overflow-hidden hidden md:flex">
                 {renderModeSwitcher()}
                 <div className="flex-1 overflow-hidden relative">
-                    {mode === 'sentence' && renderSentencePractice()}
+                    {(mode === 'sentence' || mode === 'sentence_advanced') && renderSentencePractice()}
                     {mode === 'mode1' && renderListenRepeat()}
                     {mode === 'mode3' && renderSentenceScramble()}
                 </div>
@@ -638,7 +675,7 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
              <div className="flex-1 flex flex-col h-full overflow-hidden md:hidden">
                  {renderModeSwitcher()}
                  <div className="flex-1 overflow-hidden relative">
-                     {mode === 'sentence' && renderSentencePractice()}
+                     {(mode === 'sentence' || mode === 'sentence_advanced') && renderSentencePractice()}
                      {mode === 'mode1' && renderListenRepeat()}
                      {mode === 'mode3' && renderSentenceScramble()}
                  </div>
