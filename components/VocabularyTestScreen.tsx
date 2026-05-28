@@ -565,6 +565,10 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
                     </div>
                 </div>
 
+                <div className="mb-6">
+                    <AudioPlayer audioScript={currentWord.word} />
+                </div>
+
                 <div className="grid grid-cols-3 gap-4 mb-4">
                      <button onClick={() => { handleWordPractice(currentWord, 'hard'); handleNextCard(); }} className="p-3 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition-colors">Hard</button>
                      <button onClick={() => { handleWordPractice(currentWord, 'good'); handleNextCard(); }} className="p-3 bg-yellow-500 text-white font-bold rounded-lg hover:bg-yellow-600 transition-colors">Good</button>
