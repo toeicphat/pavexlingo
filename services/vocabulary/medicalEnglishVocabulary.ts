@@ -243,7 +243,7 @@ export const medicalEnglishVocabulary: VocabularyPart = {
                 { word: 'to fill a prescription', ipa: '/tə fɪl ə prɪˈskrɪpʃn/', definition: 'lấy thuốc theo toa của bác sỹ' },
                 { word: 'triage nurse', ipa: '/ˈtriːɑːʒ nɜːrs/', definition: 'y tá phân loại bệnh' },
                 { word: 'twins', ipa: '/twɪnz/', definition: 'sinh đôi' },
-                { word: 'vomiting', ipa: '/ˈvɑːmɪtɪŋ/', definition: 'sự ói ra' }
+                { word: 'vomiting', ipa: '/ˈvɑːmɪtɪŋ/', definition: 'sự nôn, ói ra, ói mửa' }
             ]
         },
         {
@@ -477,7 +477,7 @@ export const medicalEnglishVocabulary: VocabularyPart = {
                 { word: 'constipated', ipa: '/ˈkɑːnstɪpeɪtɪd/', definition: 'bị táo bón' },
                 { word: 'constipation', ipa: '/ˌkɑːnstɪˈpeɪʃn/', definition: 'sự táo bón' },
                 { word: 'contagious', ipa: '/kənˈteɪdʒəs/', definition: 'lây, truyền nhiễm' },
-                { word: 'co-pay, co-payment', ipa: '/koʊ peɪ, koʊ ˈpeɪmənt/', definition: 'chi phí cùng trả, cùng trả tiền' },
+                { word: 'co-payment', ipa: '/koʊ peɪ, koʊ ˈpeɪmənt/', definition: 'chi phí cùng trả, cùng trả tiền' },
                 { word: 'cough up', ipa: '/kɔːf ʌp/', definition: 'ho ra, ho lên' },
                 { word: 'cramps', ipa: '/kræmps/', definition: 'cơn đau thắt' },
                 { word: 'diabetic', ipa: '/ˌdaɪəˈbetɪk/', definition: 'người mắc bệnh tiểu đường' },
@@ -492,7 +492,6 @@ export const medicalEnglishVocabulary: VocabularyPart = {
                 { word: 'groin', ipa: '/ɡrɔɪn/', definition: 'háng' },
                 { word: 'hacking cough', ipa: '/ˈhækɪŋ kɔːf/', definition: 'ho khan' },
                 { word: 'heal, (to)', ipa: '/hiːl/', definition: 'chữa khỏi bệnh, làm lành' },
-                { word: 'Health Maintenance Organization (HMO)', ipa: '/helθ ˈmeɪntənəns ˌɔːrɡənəˈzeɪʃn/', definition: 'tổ chức duy trì sức khỏe' },
                 { word: 'heart murmur', ipa: '/hɑːrt ˈmɜːrmər/', definition: 'Tiếng thổi tim' },
                 { word: 'hives', ipa: '/haɪvz/', definition: 'chứng nổi mề đay (vùng da sẩn đỏ, ngứa)' },
                 { word: 'hoarseness', ipa: '/ˈhɔːrsnəs/', definition: 'giọng khản, khàn khàn' },
@@ -513,14 +512,11 @@ export const medicalEnglishVocabulary: VocabularyPart = {
                 { word: 'lozenge, cough drop', ipa: '/ˈlɑːzɪndʒ, kɔːf drɑːp/', definition: 'viên ho, kẹo ho' },
                 { word: 'medical record number', ipa: '/ˈmedɪkl ˈrekərd ˈnʌmbər/', definition: 'số hồ sơ y tế' },
                 { word: 'medication', ipa: '/ˌmedɪˈkeɪʃn/', definition: 'thuốc, dược phẩm' },
-                { word: 'mumps', ipa: '/mʌmps/', definition: 'bệnh quai bị' },
                 { word: 'nauseated', ipa: '/ˈnɔːzieɪtɪd/', definition: 'buồn nôn' },
                 { word: 'nosebleed', ipa: '/ˈnoʊzbliːd/', definition: 'chảy máu mũi, máu cam' },
-                { word: 'numbness', ipa: '/ˈnʌmnəs/', definition: 'sự tê' },
                 { word: 'out of network', ipa: '/aʊt əv ˈnetwɜːrk/', definition: 'ngoài mạng lưới (hệ thống bảo hiểm y tế liên kết)' },
                 { word: 'pale', ipa: '/peɪl/', definition: 'xanh xao, nhợt nhạt' },
                 { word: 'pap smear', ipa: '/pæp smɪr/', definition: 'xét nghiệm ung thư cổ tử cung, trắc nghiệm bôi phét chất nhờn ở cổ tử cung để chẩn bệnh ung thư' },
-                { word: 'pass out', ipa: '/pæs aʊt/', definition: 'ngất đi, xỉu đi' },
                 { word: 'pediatrician', ipa: '/ˌpiːdiəˈtrɪʃn/', definition: 'bác sỹ khoa nhi' },
                 { word: 'Pertussis', ipa: '/pərˈtʌsɪs/', definition: 'ho gà' },
                 { word: 'phlegm', ipa: '/flem/', definition: 'đàm, đờm dãi' },
@@ -538,15 +534,16 @@ export const medicalEnglishVocabulary: VocabularyPart = {
                 { word: 'sick bay', ipa: '/sɪk beɪ/', definition: 'bệnh xá trên tàu thủy hay nhà tù' },
                 { word: 'sling', ipa: '/slɪŋ/', definition: 'băng đeo (cánh tay đau)' },
                 { word: 'sole (of the foot)', ipa: '/soʊl/', definition: 'gang bàn chân, lòng bàn chân' },
-                { word: 'spell', ipa: '/spel/', definition: 'cơn (đoạn thời gian ngắn phát bệnh, ví dụ: cơn chóng mặt)' }
+                { word: 'spell', ipa: '/spel/', definition: 'cơn (đoạn thời gian ngắn phát bệnh, ví dụ: cơn chóng mặt)' },
+                { word: 'spinal column', ipa: '/ˈspaɪnl ˈkɑːləm/', definition: 'cột sống' },
+                { word: 'spine', ipa: '/spaɪn/', definition: 'xương sống' },
             ]
         },
         {
             id: 20,
             title: 'L3 - Medical term 4',
             words: [
-                { word: 'spinal column', ipa: '/ˈspaɪnl ˈkɑːləm/', definition: 'cột sống' },
-                { word: 'spine', ipa: '/spaɪn/', definition: 'xương sống' },
+                
                 { word: 'spleen', ipa: '/spliːn/', definition: 'lá lách, tì' },
                 { word: 'sprain', ipa: '/spreɪn/', definition: 'trặc gân, bong gân' },
                 { word: 'strain', ipa: '/streɪn/', definition: 'căng cơ quá mức' },
@@ -554,7 +551,6 @@ export const medicalEnglishVocabulary: VocabularyPart = {
                 { word: 'stretcher', ipa: '/ˈstretʃər/', definition: 'cái cáng, cái băng ca (để khiêng người bệnh)' },
                 { word: 'stuffed up', ipa: '/stʌft ʌp/', definition: 'tình trạng bị nghẹt (mũi)' },
                 { word: 'swollen', ipa: '/ˈswoʊlən/', definition: 'bị sưng lên' },
-                { word: 'tetanus', ipa: '/ˈtetənəs/', definition: 'bệnh phong đòn gánh, bệnh uốn ván' },
                 { word: 'The Monster/ The Ninja', ipa: '/ðə ˈmɑːnstər/ ðə ˈnɪndʒə/', definition: 'bị nhiễm HIV (tiếng lóng y tế)' },
                 { word: 'thermometer', ipa: '/θərˈmɑːmɪtər/', definition: 'nhiệt kế (dụng cụ đo nhiệt độ), hàn thử biểu' },
                 { word: 'throbbing (pain)', ipa: '/ˈθrɑːbɪŋ/', definition: 'sự đau buốt, đau nhoi nhói' },
@@ -568,7 +564,6 @@ export const medicalEnglishVocabulary: VocabularyPart = {
                 { word: 'vaginal yeast infection', ipa: '/ˈvædʒənl jiːst ɪnˈfekʃn/', definition: 'nấm men âm đạo, sự viêm ngứa do nấm trong âm hộ' },
                 { word: 'vital signs', ipa: '/ˈvaɪtl saɪnz/', definition: 'những dấu hiệu sinh tồn (mạch, nhiệt độ, huyết áp...)' },
                 { word: 'void', ipa: '/vɔɪd/', definition: 'bài tiết (tiểu tiện/đại tiện)' },
-                { word: 'vomiting', ipa: '/ˈvɑːmɪtɪŋ/', definition: 'sự nôn, sự ói mửa' },
                 { word: 'walker', ipa: '/ˈwɔːkər/', definition: 'dụng cụ tập đi, khung tập đi cho người yếu chân' },
                 { word: 'walk-in clinic', ipa: '/wɔːk ɪn ˈklɪnɪk/', definition: 'phòng khám không cần hẹn trước' },
                 { word: 'watery stool', ipa: '/ˈwɔːtəri stuːl/', definition: 'phân lỏng, phân loãng' },
@@ -788,7 +783,8 @@ export const medicalEnglishVocabulary: VocabularyPart = {
             words: [
                 { word: 'blood sample / test / specimen', ipa: '/blʌd ˈsæmpl / test / ˈspesɪmən/', definition: 'mẫu máu/thử máu/mẫu xét nghiệm máu' },
                 { word: 'blood sugar (blood glucose)', ipa: '/blʌd ˈʃʊɡər/', definition: 'lượng đường huyết' },
-                { word: 'blood thinner / anticoagulant', ipa: '/blʌd ˈθɪnər / ˌæntikoʊˈæɡjələnt/', definition: 'chất làm loãng máu / chất kháng đông' },
+                { word: 'blood thinner', ipa: '/blʌd ˈθɪnər/', definition: 'chất làm loãng máu / chất kháng đông' },
+                { word: 'anticoagulant', ipa: '/æntikoʊˈæɡjələnt/', definition: 'chất làm loãng máu / chất kháng đông' },
                 { word: 'blood work', ipa: '/blʌd wɜːrk/', definition: 'sự thử máu' },
                 { word: 'blood-poisoning (sepsis)', ipa: '/blʌd ˈpɔɪzənɪŋ ˈsepsɪs/', definition: 'nhiễm khuẩn huyết' },
                 { word: 'blood-sugar reading', ipa: '/blʌd ˈʃʊɡər ˈriːdɪŋ/', definition: 'số lượng đường trong máu hay độ đường trong máu' },
@@ -812,7 +808,6 @@ export const medicalEnglishVocabulary: VocabularyPart = {
                 { word: 'chest pain', ipa: '/tʃest peɪn/', definition: 'đau ngực' },
                 { word: 'child safety seat', ipa: '/tʃaɪld ˈseɪfti siːt/', definition: 'ghế an toàn trẻ em' },
                 { word: 'childbirth', ipa: '/ˈtʃaɪldbɜːrθ/', definition: 'sanh con' },
-                { word: 'choking', ipa: '/ˈtʃoʊkɪŋ/', definition: 'nghẹt (hơi thở)' },
                 { word: 'cholesterol', ipa: '/kəˈlestərɔːl/', definition: 'chất mỡ trong cơ thể' },
                 { word: 'chronic conditions', ipa: '/ˈkrɑːnɪk kənˈdɪʃnz/', definition: 'tình trạng hay bệnh kinh niên, mạn tính' },
                 { word: 'circulatory disease', ipa: '/ˈsɜːrkjələtɔːri dɪˈziːz/', definition: 'bệnh tuần hoàn máu' },
@@ -1009,7 +1004,6 @@ export const medicalEnglishVocabulary: VocabularyPart = {
                 { word: 'milk pump (breast)', ipa: '/mɪlk pʌmp/', definition: 'đồ bơm sữa' },
                 { word: 'miscarriage', ipa: '/ˈmɪskærɪdʒ/', definition: 'sự sẩy thai, sự hư thai' },
                 { word: 'mucous', ipa: '/ˈmjuːkəs/', definition: 'niêm dịch, dịch nhầy , tiết niêm dịch, tiết dịch nhầy' },
-                { word: 'mumps', ipa: '/mʌmps/', definition: 'bệnh quai bị' },
                 { word: 'murmur (heart)', ipa: '/ˈmɜːrmər/', definition: 'tiếng thì thầm của tim, tiếng thổi tim' },
                 { word: 'myocardial infarction', ipa: '/ˌmaɪəˈkɑːrdiəl ɪnˈfɑːrkʃn/', definition: 'nhồi máu cơ tim' },
                 { word: 'navel, belly button', ipa: '/ˈneɪvl, ˈbeli ˈbʌtn/', definition: 'rốn' },
@@ -1043,7 +1037,6 @@ export const medicalEnglishVocabulary: VocabularyPart = {
             title: 'L4 - Set 9',
             words: [
                 { word: 'pap smear test', ipa: '/pæp smɪr test/', definition: 'xét nghiệm ung thư cổ tử cung, trắc nghiệm bôi phét chất nhờn ở cổ tử cung để chẩn bệnh ung thư' },
-                { word: 'PCP', ipa: '/ˌpiː siː ˈpiː/', definition: 'bác sỹ chính săn sóc' },
                 { word: 'peak flow meter', ipa: '/piːk floʊ ˈmiːtər/', definition: 'lưu lượng đỉnh kế' },
                 { word: 'pediatrician', ipa: '/ˌpiːdiəˈtrɪʃn/', definition: 'bác sỹ khoa nhi' },
                 { word: 'perineal', ipa: '/ˌperɪˈniːəl/', definition: '(thuộc) đáy chậu' },

@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import SelectionCard from './SelectionCard';
 import { ArrowLeftIcon, XCircleIcon } from './icons';
-import { ListeningIntenseTestData } from '../types';
+import { ListeningIntenseTestData, User } from '../types';
 import { allListeningIntenseTests } from '../services/listeningIntenseLibrary';
 
 interface ListeningIntenseScreenProps {
+    currentUser?: User | null;
     onBack: () => void;
     onSelectPart: (testId: number, part: 'part1' | 'part2' | 'part3' | 'part4') => void;
 }
 
-const ListeningIntenseScreen: React.FC<ListeningIntenseScreenProps> = ({ onBack, onSelectPart }) => {
+const ListeningIntenseScreen: React.FC<ListeningIntenseScreenProps> = ({ currentUser, onBack, onSelectPart }) => {
     const [selectedTest, setSelectedTest] = useState<ListeningIntenseTestData | null>(null);
 
     const handleTestClick = (test: ListeningIntenseTestData) => {
@@ -46,6 +47,7 @@ const ListeningIntenseScreen: React.FC<ListeningIntenseScreenProps> = ({ onBack,
                             description={`Luyện nghe chuyên sâu bài số ${test.id}.`}
                             onClick={() => handleTestClick(test)}
                             isComingSoon={false}
+                            isLocked={!currentUser && test.id !== 1}
                         />
                     ))}
                 </div>

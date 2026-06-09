@@ -5,13 +5,13 @@ import { BookOpenIcon, BrainIcon } from './icons';
 import SelectionCard from './SelectionCard';
 
 interface DictationScreenProps {
-    currentUser: User;
+    currentUser: User | null;
     onSelectTestSet: (testId: number) => void;
     dictationMode: DictationMode;
     onModeChange: (mode: DictationMode) => void;
 }
 
-const DictationScreen: React.FC<DictationScreenProps> = ({ onSelectTestSet, dictationMode, onModeChange }) => {
+const DictationScreen: React.FC<DictationScreenProps> = ({ currentUser, onSelectTestSet, dictationMode, onModeChange }) => {
     return (
         <div className="container mx-auto px-4 py-12">
             <div className="max-w-6xl mx-auto">
@@ -74,6 +74,7 @@ const DictationScreen: React.FC<DictationScreenProps> = ({ onSelectTestSet, dict
                                 title={test.title}
                                 description={test.description}
                                 onClick={() => onSelectTestSet(test.id)}
+                                isLocked={!currentUser}
                             />
                         ))}
                     </div>

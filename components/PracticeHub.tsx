@@ -133,7 +133,7 @@ const PracticeHub: React.FC<PracticeHubProps> = ({
           Vì đây là sản phẩm đang phát triển. Nếu có sai sót, xin vui lòng nhắn tin cho thầy Phát qua Facebook cá nhân ở cuối trang.
         </p>
       </div>
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         <PracticeCard 
             title="Từ vựng"
             description="Luyện tập từ vựng qua hệ thống lặp lại ngắt quãng (SRS) và các trò chơi tương tác."
@@ -147,7 +147,6 @@ const PracticeHub: React.FC<PracticeHubProps> = ({
             onClick={onNavigateToDictation}
             icon={SectionDictationIcon}
             iconColor="text-orange-500"
-            faded={!isLoggedIn}
         />
         <PracticeCard 
             title="Ngữ pháp"
@@ -155,7 +154,6 @@ const PracticeHub: React.FC<PracticeHubProps> = ({
             onClick={onNavigateToGrammar}
             icon={SectionGrammarIcon}
             iconColor="text-green-600"
-            faded={!isLoggedIn}
         />
         <PracticeCard 
             title="Listening (Chuyên sâu)"
@@ -163,7 +161,6 @@ const PracticeHub: React.FC<PracticeHubProps> = ({
             onClick={onNavigateToListeningIntense}
             icon={ListeningIntenseIcon}
             iconColor="text-blue-600"
-            faded={!isLoggedIn}
         />
       </div>
 
@@ -171,7 +168,7 @@ const PracticeHub: React.FC<PracticeHubProps> = ({
         <div className="relative overflow-hidden p-8 rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-400 to-amber-500 border-2 border-yellow-200/50 shadow-xl shadow-yellow-500/10 shine flex flex-col justify-center">
             <div className="relative text-red-900 space-y-4 font-medium">
                 <p>
-                    <strong>Lưu ý:</strong> Bạn chỉ đang truy cập được vào mục TỪ VỰNG. Nếu bạn nghiêm túc và quyết tâm chinh phục mục tiêu TOEIC trong thời gian tới, hãy liên hệ ngay với Thầy qua Facebook (ở cuối trang) để được mở khóa các tính năng khác <strong>MIỄN PHÍ</strong>. Điều kiện cực kỳ đơn giản: Hãy chia sẻ rõ ràng Kế hoạch chinh phục TOEIC của bạn (<em>Ví dụ: Thời gian luyện thi? Cường độ ôn luyện mỗi tuần? Ngày dự kiến đi thi?</em>).
+                    <strong>Lưu ý:</strong> Bạn đang được trải nghiệm một số bài học miễn phí. Nếu bạn nghiêm túc và quyết tâm chinh phục mục tiêu TOEIC trong thời gian tới, hãy liên hệ ngay với Thầy qua Facebook (ở cuối trang) để được mở khóa <strong>TOÀN BỘ</strong> các tính năng <strong>MIỄN PHÍ</strong>. Điều kiện cực kỳ đơn giản: Hãy chia sẻ rõ ràng Kế hoạch chinh phục TOEIC của bạn (<em>Ví dụ: Thời gian luyện thi? Cường độ ôn luyện mỗi tuần? Ngày dự kiến đi thi?</em>).
                 </p>
                 <p>
                     Thầy sẽ cấp cho bạn tài khoản truy cập vào trang web có thời hạn 6 tháng – một khoảng thời gian lý tưởng và thực tế nhất cho sự bứt phá. Sau 6 tháng, nếu bạn chưa hoàn thành kỳ thi, tài khoản sẽ được ưu tiên nhường lại cho những học viên mới, đảm bảo tài nguyên được sử dụng hiệu quả nhất!

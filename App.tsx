@@ -37,8 +37,7 @@ const mockUsers: User[] = [
     { username: 'tranngoc.tai6904@gmail.com', password: 'thidautoeic' },
     { username: 'trangnt8905@gmail.com', password: 'thidautoeic' },
     { username: 'luongthimo357@gmail.com', password: 'thidautoeic' },
-    { username: 'vothiphuongvy95@gmail.com', password: 'thidautoeic' }, 
-    { username: 'thaotrang27771@gmail.com', password: 'thidautoeic' }, 
+    { username: 'thaotrang27771@gmail.com', password: 'thidautoeic' },
     { username: 'trananhthu1802@gmail.com', password: 'thidautoeic' },
 ];
 
@@ -141,12 +140,8 @@ const App: React.FC = () => {
 
     // Dictation Handlers
     const handleNavigateToDictation = useCallback(() => {
-        if (!currentUser) {
-            alert("Bạn cần đăng nhập để sử dụng tính năng này");
-            return;
-        }
         setAppState(AppState.DictationHub);
-    }, [currentUser]);
+    }, []);
 
     const handleSelectDictationTestSet = useCallback((testId: number) => {
         setSelectedDictationTestId(testId);
@@ -165,12 +160,8 @@ const App: React.FC = () => {
 
     // Grammar Handlers
     const handleNavigateToGrammar = useCallback(() => {
-        if (!currentUser) {
-            alert("Bạn cần đăng nhập để sử dụng tính năng này");
-            return;
-        }
         setAppState(AppState.GrammarHub);
-    }, [currentUser]);
+    }, []);
 
     const handleSelectGrammarTopic = useCallback((topic: string) => {
         setSelectedGrammarTopic(topic);
@@ -189,12 +180,8 @@ const App: React.FC = () => {
 
     // Listening Intense Handlers
     const handleNavigateToListeningIntense = useCallback(() => {
-        if (!currentUser) {
-            alert("Bạn cần đăng nhập để sử dụng tính năng này");
-            return;
-        }
         setAppState(AppState.ListeningIntenseHub);
-    }, [currentUser]);
+    }, []);
 
     const handleSelectListeningIntensePart = useCallback((testId: number, part: 'part1' | 'part2' | 'part3' | 'part4') => {
         const test = getListeningIntenseTest(testId);
@@ -250,7 +237,6 @@ const App: React.FC = () => {
                 if (!selectedVocabularyTest) return null;
                 return <VocabularyTestScreen testData={selectedVocabularyTest} onBack={handleBackToVocabularyPartHome} />;
             case AppState.DictationHub:
-                if (!currentUser) return <PracticeHub {...practiceHubProps} />;
                 return (
                     <DictationScreen 
                         currentUser={currentUser} 
@@ -272,9 +258,12 @@ const App: React.FC = () => {
                     />
                 );
             case AppState.GrammarHub:
-                if (!currentUser) return <PracticeHub {...practiceHubProps} />;
                 return (
-                    <GrammarScreen onSelectTopic={handleSelectGrammarTopic} onStartRandomTest={handleStartGrammarRandomTest} />
+                    <GrammarScreen 
+                        currentUser={currentUser}
+                        onSelectTopic={handleSelectGrammarTopic} 
+                        onStartRandomTest={handleStartGrammarRandomTest} 
+                    />
                 );
             case AppState.GrammarTopic:
                 if (!selectedGrammarTopic) return null;
@@ -292,9 +281,12 @@ const App: React.FC = () => {
                     />
                 );
             case AppState.ListeningIntenseHub:
-                if (!currentUser) return <PracticeHub {...practiceHubProps} />;
                 return (
-                    <ListeningIntenseScreen onBack={handleGoHome} onSelectPart={handleSelectListeningIntensePart} />
+                    <ListeningIntenseScreen 
+                        currentUser={currentUser}
+                        onBack={handleGoHome} 
+                        onSelectPart={handleSelectListeningIntensePart} 
+                    />
                 );
             case AppState.ListeningIntensePractice:
                 if (!listeningIntenseData) return null;
