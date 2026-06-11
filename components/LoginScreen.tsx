@@ -17,7 +17,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, users, isLogg
     e.preventDefault();
     if (isLoggingIn) return;
     
-    const user = users.find(u => u.username === username && u.password === password);
+    const inputUsername = username.trim().toLowerCase();
+    const inputPassword = password.trim();
+    
+    const user = users.find(u => 
+      u.username.trim().toLowerCase() === inputUsername && 
+      u.password.trim() === inputPassword
+    );
+    
     if (user) {
       onLoginSuccess(user);
     } else {
