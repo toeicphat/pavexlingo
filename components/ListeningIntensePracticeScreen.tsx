@@ -156,6 +156,32 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
     // --- Logic for Mode 2 (Sentence Practice) moved to top level ---
     const currentInputValue = currentSentence ? (userInputs[currentSentence.id] || []).join(' ') : '';
     
+    const [hiddenPercentage, setHiddenPercentage] = useState<30 | 50 | 100>(100);
+
+    const preRevealedIndices = useMemo(() => {
+        if (!currentSentence || hiddenPercentage === 100 || mode !== 'sentence') return new Set<number>();
+        const countToReveal = Math.floor(currentSentence.words.length * ((100 - hiddenPercentage) / 100));
+        const indices = new Set<number>();
+        
+        let seed = currentSentence.id.length || 0;
+        for(let i=0; i<currentSentence.id.length; i++) {
+        	seed += currentSentence.id.charCodeAt(i);
+        }
+        
+        const random = () => {
+            const x = Math.sin(seed++) * 10000;
+            return x - Math.floor(x);
+        };
+        
+        const possibleIndices = Array.from({length: currentSentence.words.length}, (_, i) => i);
+        possibleIndices.sort(() => random() - 0.5);
+        
+        for (let i = 0; i < countToReveal; i++) {
+            indices.add(possibleIndices[i]);
+        }
+        return indices;
+    }, [currentSentence, hiddenPercentage, mode]);
+
     const solvedIndices = useMemo(() => {
         if (!currentSentence) return new Set<number>();
         const sIndices = new Set<number>();
@@ -167,7 +193,7 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
         userWordsClean.forEach(uWord => {
             if (!uWord) return;
             const foundIndex = targetWordsClean.findIndex((tWord, tIdx) => 
-                tWord === uWord && !tempMatchedIndices.has(tIdx)
+                tWord === uWord && !tempMatchedIndices.has(tIdx) && !preRevealedIndices.has(tIdx)
             );
             if (foundIndex !== -1) {
                 tempMatchedIndices.add(foundIndex);
@@ -175,9 +201,9 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
             }
         });
         return sIndices;
-    }, [currentSentence, currentInputValue]);
+    }, [currentSentence, currentInputValue, preRevealedIndices]);
 
-    const allSolved = currentSentence && solvedIndices.size === currentSentence.words.length && currentSentence.words.length > 0;
+    const allSolved = currentSentence && (solvedIndices.size + preRevealedIndices.size) === currentSentence.words.length && currentSentence.words.length > 0;
 
     // Auto Next Effect
     useEffect(() => {
@@ -380,7 +406,7 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
                     onClick={() => { setMode('sentence_advanced'); getRandomSentence(); }}
                     className={`px-4 py-2 rounded-md text-sm font-bold transition-all flex items-center justify-center gap-1 ${mode === 'sentence_advanced' ? 'bg-white dark:bg-slate-600 shadow text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
                 >
-                    Nghe & Chép (nâng cao)
+                    Nghe & Chép Random (nâng cao)
                 </button>
                 <button 
                     onClick={() => setMode('mode1')}
@@ -484,7 +510,22 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
                     <div className="max-w-3xl mx-auto space-y-8">
                         {/* Audio Player */}
                         <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-2xl border border-blue-100 dark:border-blue-800">
-                             <h3 className="text-center font-bold text-slate-700 dark:text-slate-200 mb-4">Nghe và chép lại (Từ khóa)</h3>
+                             <div className="flex flex-col sm:flex-row items-center justify-between mb-4 gap-4">
+                                 <h3 className="font-bold text-slate-700 dark:text-slate-200">Nghe và chép lại (Từ khóa)</h3>
+                                 {mode === 'sentence' && (
+                                     <div className="flex bg-white dark:bg-slate-800 rounded-lg p-1 shadow-sm border border-slate-200 dark:border-slate-700">
+                                        {([30, 50, 100] as const).map(pct => (
+                                            <button 
+                                                key={pct}
+                                                onClick={() => setHiddenPercentage(pct)}
+                                                className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${hiddenPercentage === pct ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
+                                            >
+                                                Ẩn {pct}%
+                                            </button>
+                                        ))}
+                                     </div>
+                                 )}
+                             </div>
                              <AudioPlayer ref={audioPlayerRef} audioScript={currentSentence.text} />
                         </div>
 
@@ -493,7 +534,7 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
                             {/* Feedback Blocks */}
                             <div className="flex flex-wrap gap-2 leading-loose justify-center min-h-[60px] p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700">
                                 {currentSentence.words.map((word, index) => {
-                                    const isSolved = solvedIndices.has(index);
+                                    const isSolved = solvedIndices.has(index) || preRevealedIndices.has(index);
                                     
                                     let blockContent = "______";
                                     let blockClass = "px-2 py-1 border-b-2 text-lg transition-all duration-300 rounded-t ";
@@ -537,7 +578,7 @@ const ListeningIntensePracticeScreen: React.FC<ListeningIntensePracticeScreenPro
 
                                     <div className="flex items-center gap-4">
                                         <p id="score-display" className="text-sm font-bold text-slate-500 transition-all duration-200">
-                                            Found: {solvedIndices.size} / {currentSentence.words.length} words
+                                            Found: {solvedIndices.size + preRevealedIndices.size} / {currentSentence.words.length} words
                                         </p>
                                         <button 
                                             onClick={() => setIsAutoNext(!isAutoNext)}
