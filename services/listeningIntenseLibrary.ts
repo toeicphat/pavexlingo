@@ -174,7 +174,7 @@ const test3Part2Raw: RawPartData[] = [
     { id: 13216, title: "Question 16", text: "Are you considering hiring a public relations firm?\n(A) I wasn't at that press conference.\n(B) No, we decided not to.\n(C) It's in the closet." },
     { id: 13217, title: "Question 17", text: "Does this hallway lead to the lobby or to the courtyard?\n(A) My brother mentioned that.\n(B) How much does the box weigh?\n(C) To the lobby, I think." },
     { id: 13218, title: "Question 18", text: "The company's headquarters is in Houston, right?\n(A) This quarter's budget.\n(B) Let me look at the directory.\n(C) From nine to three." },
-    { id: 13219, title: "Question 19", text: "Aren't the windows in the warehouse supposed to be replaced?\n(A) Sure, I'll frame the picture.\n(B) No, I don't have any.\n(C) Mr. Bora ordered them." },
+    { id: 13219, title: "Question 19", text: "Aren't the windows in the warehouse supposed to be replaced?\n(A) Sure, I'll frame the picture.\n(B) No, I don't have any.\n(C) Mr Bora ordered them." },
     { id: 13220, title: "Question 20", text: "Who's leading the workshop on Friday?\n(A) Nice seeing you, too!\n(B) The other team has a ten-point lead.\n(C) It'll be Olga." },
     { id: 13221, title: "Question 21", text: "Should we join our department's book club?\n(A) An award-winning author.\n(B) The office supplies are in the storage room.\n(C) They could use a few more people." },
     { id: 13222, title: "Question 22", text: "Shouldn't this package be returned?\n(A) Several packets of stamps from the post office.\n(B) Yes, it has to go back to the manufacturer.\n(C) Didn't she return from her trip last week?" },

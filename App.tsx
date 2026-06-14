@@ -18,7 +18,7 @@ import { AppState, VocabularyTest, VocabularyPart, User, DictationMode, TestData
 import { getVocabularyPart, getVocabularyTest } from './services/vocabularyLibrary';
 import { allDictationTests, getDictationExercisesForParts } from './services/dictationLibrary';
 import { getListeningIntenseTest } from './services/listeningIntenseLibrary';
-import { LogoIcon } from './components/icons';
+import { LogoIcon, XCircleIcon } from './components/icons';
 
 const mockUsers: User[] = [
     { username: 'admin', password: 'phattoeic' },
@@ -46,6 +46,7 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>(AppState.PracticeHub);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState<boolean>(false);
   
   // Vocabulary State
   const [selectedVocabularyPart, setSelectedVocabularyPart] = useState<VocabularyPart | null>(null);
@@ -230,7 +231,7 @@ const App: React.FC = () => {
                 );
             case AppState.VocabularyPartHome:
                 if (!selectedVocabularyPart) return null;
-                return <VocabularyPartScreen partData={selectedVocabularyPart} onSelectTest={handleSelectVocabularyTest} onBack={handleBackToVocabularyHome} />;
+                return <VocabularyPartScreen partData={selectedVocabularyPart} onSelectTest={handleSelectVocabularyTest} onStartCustomTest={handleStartCustomTest} onBack={handleBackToVocabularyHome} />;
             case AppState.VocabularyTest:
                 if (!selectedVocabularyTest) return null;
                 return <VocabularyTestScreen testData={selectedVocabularyTest} onBack={handleBackToVocabularyPartHome} />;
@@ -304,6 +305,14 @@ const App: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-4">
                         <button 
+                            onClick={() => setShowUpgradeModal(true)}
+                            className="gold-bg p-[2px] rounded-lg shadow-sm flex items-center justify-center transition-transform hover:scale-105"
+                        >
+                            <div className="bg-white dark:bg-slate-800 rounded-lg px-4 py-1.5 w-full h-full">
+                                <span className="gold-text text-sm font-bold tracking-widest uppercase">Nâng cấp Pro</span>
+                            </div>
+                        </button>
+                        <button 
                             onClick={handleNavigateToGuide}
                             className="px-4 py-2 text-sm font-bold text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors"
                         >
@@ -336,6 +345,31 @@ const App: React.FC = () => {
             </main>
             
             <StatsFooter />
+
+            {showUpgradeModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-6 w-full max-w-sm border border-slate-200 dark:border-slate-700 relative text-center">
+                        <button 
+                            onClick={() => setShowUpgradeModal(false)}
+                            className="absolute top-3 right-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                        >
+                            <XCircleIcon className="w-6 h-6" />
+                        </button>
+                        <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4 uppercase gold-text inline-block">Nâng cấp Pro</h3>
+                        <div className="text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
+                            <p>Để nâng cấp tài khoản Pro,</p>
+                            <p>bạn hãy liên hệ với thầy Phát</p>
+                            <p>qua Facebook ở cuối trang nhé.</p>
+                        </div>
+                        <button 
+                            onClick={() => setShowUpgradeModal(false)}
+                            className="mt-6 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors w-full"
+                        >
+                            Đã hiểu
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

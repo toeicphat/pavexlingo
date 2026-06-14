@@ -1,28 +1,42 @@
 import React, { useState } from 'react';
 import { VocabularyPart, VocabularyTest } from '../types';
 import SelectionCard from './SelectionCard';
-import { ArrowLeftIcon, XCircleIcon } from './icons';
+import { ArrowLeftIcon, ArrowRightIcon, XCircleIcon } from './icons';
 
 interface VocabularyPartScreenProps {
     partData: VocabularyPart;
     onSelectTest: (partId: number, testId: number, limit?: number) => void;
+    onStartCustomTest: (test: VocabularyTest) => void;
     onBack: () => void;
 }
 
-const VocabularyPartScreen: React.FC<VocabularyPartScreenProps> = ({ partData, onSelectTest, onBack }) => {
+const VocabularyPartScreen: React.FC<VocabularyPartScreenProps> = ({ partData, onSelectTest, onStartCustomTest, onBack }) => {
     const [showLimitModal, setShowLimitModal] = useState(false);
     const [selectedTestId, setSelectedTestId] = useState<number | null>(null);
     const [wordLimit, setWordLimit] = useState<number>(30);
     const [maxWords, setMaxWords] = useState<number>(0);
 
+    const [isSelectionMode, setIsSelectionMode] = useState<boolean>(false);
+    const [selectedSets, setSelectedSets] = useState<Set<number>>(new Set());
+
     const handleTestClick = (test: VocabularyTest) => {
-        if (test.words.length > 30) {
-            setSelectedTestId(test.id);
-            setMaxWords(test.words.length);
-            setWordLimit(30);
-            setShowLimitModal(true);
+        if (isSelectionMode) {
+            const newSelected = new Set(selectedSets);
+            if (newSelected.has(test.id)) {
+                newSelected.delete(test.id);
+            } else {
+                newSelected.add(test.id);
+            }
+            setSelectedSets(newSelected);
         } else {
-            onSelectTest(partData.id, test.id);
+            if (test.words.length > 30) {
+                setSelectedTestId(test.id);
+                setMaxWords(test.words.length);
+                setWordLimit(30);
+                setShowLimitModal(true);
+            } else {
+                onSelectTest(partData.id, test.id);
+            }
         }
     };
 
@@ -34,13 +48,63 @@ const VocabularyPartScreen: React.FC<VocabularyPartScreenProps> = ({ partData, o
         }
     };
 
+    const handleStartCombinedTest = () => {
+        if (selectedSets.size === 0) return;
+        
+        let combinedWords: any[] = [];
+        selectedSets.forEach(testId => {
+            const test = partData.tests.find(t => t.id === testId);
+            if (test) {
+                combinedWords = [...combinedWords, ...test.words];
+            }
+        });
+
+        const customTest: VocabularyTest = {
+            id: -1,
+            title: `Ôn tập tổng hợp (${selectedSets.size} bộ)`,
+            words: combinedWords
+        };
+        onStartCustomTest(customTest);
+    };
+
     return (
         <div className="container mx-auto px-4 py-12">
             <div className="max-w-4xl mx-auto">
-                <button onClick={onBack} className="mb-8 inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition-colors">
-                    <ArrowLeftIcon className="h-5 w-5 mr-2" />
-                    Back to Vocabulary Hub
-                </button>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                    <button onClick={onBack} className="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition-colors">
+                        <ArrowLeftIcon className="h-5 w-5 mr-2" />
+                        Back to Vocabulary Hub
+                    </button>
+                    
+                    <div className="flex gap-2">
+                        {isSelectionMode ? (
+                            <>
+                                <button 
+                                    onClick={() => { setIsSelectionMode(false); setSelectedSets(new Set()); }}
+                                    className="px-4 py-2 border border-slate-300 text-slate-600 rounded-lg font-semibold hover:bg-slate-50 transition-colors text-sm"
+                                >
+                                    Hủy
+                                </button>
+                                <button 
+                                    onClick={handleStartCombinedTest}
+                                    disabled={selectedSets.size === 0}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm disabled:opacity-50 flex items-center gap-2"
+                                >
+                                    Bắt đầu học {selectedSets.size} bộ
+                                    {selectedSets.size > 0 && <ArrowRightIcon className="w-4 h-4" />}
+                                </button>
+                            </>
+                        ) : (
+                            <button 
+                                onClick={() => setIsSelectionMode(true)}
+                                className="px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg font-semibold hover:bg-blue-100 transition-colors text-sm shadow-sm"
+                            >
+                                Ghép các bộ từ
+                            </button>
+                        )}
+                    </div>
+                </div>
+
                 <div className="text-center mb-12">
                     <h2 className="text-4xl font-extrabold text-slate-900 sm:text-5xl dark:text-white">{partData.title}</h2>
                     <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">{partData.description}</p>
@@ -53,6 +117,9 @@ const VocabularyPartScreen: React.FC<VocabularyPartScreenProps> = ({ partData, o
                             title={test.title}
                             description={`${test.words.length} words`}
                             onClick={() => handleTestClick(test)}
+                            showCheckbox={isSelectionMode}
+                            isSelected={selectedSets.has(test.id)}
+                            isLocked={false} // Assuming tests are rarely locked individually unless specified by part
                         />
                     ))}
                 </div>

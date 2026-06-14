@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { VocabularyTest, VocabItem } from '../types';
 import { updateWordSrsLevel } from '../services/vocabularyService';
-import { BrainIcon, ShuffleIcon, ArrowLeftIcon, ArrowRightIcon, GridIcon, TypeIcon, HeadphoneIcon, LinkIcon, FlipIcon, RefreshIcon, TestQuizIcon, AudioChoiceIcon, DictationModeIcon, FlashcardsModeIcon } from './icons';
+import { BrainIcon, ShuffleIcon, ArrowLeftIcon, ArrowRightIcon, GridIcon, TypeIcon, HeadphoneIcon, LinkIcon, FlipIcon, RefreshIcon, TestQuizIcon, AudioChoiceIcon, DictationModeIcon, FlashcardsModeIcon, XCircleIcon, SparklesIcon } from './icons';
 import AudioPlayer from './AudioPlayer';
 
 type StudyMode = 'flashcards' | 'quiz' | 'matching_game' | 'scrambler' | 'spelling_recall' | 'audio_dictation' | 'definition_match' | 'audio_choice';
@@ -71,6 +71,7 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
     // State for Audio Choice
     const [audioChoiceQuestions, setAudioChoiceQuestions] = useState<AudioChoiceQuestion[]>([]);
     const [currentAudioChoiceIndex, setCurrentAudioChoiceIndex] = useState(0);
+    const [isAudioChoiceSessionFinished, setIsAudioChoiceSessionFinished] = useState(false);
     const [isAutoAdvance, setIsAutoAdvance] = useState(false);
 
     // State for matching game
@@ -156,6 +157,7 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
     const startAudioChoiceGame = useCallback(() => {
         generateAudioChoiceQuestions();
         setCurrentAudioChoiceIndex(0);
+        setIsAudioChoiceSessionFinished(false);
     }, [generateAudioChoiceQuestions]);
 
     const setupMatchingTurn = useCallback((deck: VocabItem[], turn: number) => {
@@ -376,6 +378,8 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
             setTimeout(() => {
                 if (currentAudioChoiceIndex + 1 < audioChoiceQuestions.length) {
                     setCurrentAudioChoiceIndex(prev => prev + 1);
+                } else {
+                    setIsAudioChoiceSessionFinished(true);
                 }
             }, 1000);
         }
@@ -631,16 +635,88 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
         );
     };
 
-    const renderQuizResults = () => (
-        <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 text-center">
-            <h3 className="text-2xl font-bold text-slate-800">Quiz Complete!</h3>
-            <p className="text-6xl font-bold text-blue-600 my-4">{score} / {quizQuestions.length}</p>
-            <p className="text-lg text-slate-600">You've completed the quiz. Words you got wrong have been marked for 'hard' review in your SRS deck.</p>
-            <button onClick={startQuizSession} className="mt-8 px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors">
-                Try Again
-            </button>
-        </div>
-    );
+    type ResultItem = {
+        word: VocabItem;
+        userAnswer: string | null;
+        isCorrect: boolean;
+    };
+
+    const renderResultsBoard = (
+        title: string,
+        items: ResultItem[],
+        onRetry: () => void
+    ) => {
+        const total = items.length;
+        const correctCount = items.filter(i => i.isCorrect).length;
+        const incorrectItems = items.filter(i => !i.isCorrect);
+
+        return (
+            <div className="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
+                <div className="text-center mb-8">
+                    <h3 className="text-2xl lg:text-3xl font-extrabold text-slate-800 dark:text-slate-100 mb-2">{title}</h3>
+                    <div className="inline-block px-6 py-4 bg-blue-50 dark:bg-slate-900 rounded-2xl border border-blue-100 dark:border-slate-600">
+                        <p className="text-sm text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mb-1">Total Score</p>
+                        <p className="text-5xl font-black text-blue-600 dark:text-blue-400">{correctCount} <span className="text-2xl text-slate-400 dark:text-slate-500">/ {total}</span></p>
+                    </div>
+                </div>
+
+                {incorrectItems.length > 0 && (
+                    <div className="mb-8 bg-red-50 dark:bg-red-900/20 p-6 rounded-xl border border-red-100 dark:border-red-900/50">
+                        <h4 className="text-lg font-bold text-red-800 dark:text-red-400 mb-4 flex items-center gap-2">
+                            <XCircleIcon className="w-5 h-5" /> Incorrect Words to Review
+                        </h4>
+                        <div className="space-y-3 max-h-96 overflow-y-auto">
+                            {incorrectItems.map((item, idx) => (
+                                <div key={idx} className="bg-white dark:bg-slate-900 p-3 rounded-lg border border-red-200 dark:border-red-900/50 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                    <div>
+                                        <span className="font-bold text-slate-800 dark:text-slate-200 text-lg mr-2">{item.word.word}</span>
+                                        {item.word.ipa && <span className="text-sm font-mono text-slate-500 dark:text-slate-400 mr-2">{item.word.ipa}</span>}
+                                        <span className="text-slate-600 dark:text-slate-400 text-sm">({item.word.vietnamese})</span>
+                                    </div>
+                                    <div className="text-sm">
+                                        <span className="text-slate-500 dark:text-slate-400">Your answer: </span>
+                                        <span className="font-semibold text-red-600 dark:text-red-400 line-through mr-2">{item.userAnswer || '(skipped)'}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+                
+                {incorrectItems.length === 0 && (
+                     <div className="mb-8 bg-green-50 dark:bg-green-900/20 p-6 rounded-xl border border-green-100 dark:border-green-900/50 text-center">
+                        <h4 className="text-lg font-bold text-green-800 dark:text-green-400 flex justify-center items-center gap-2">
+                            <SparklesIcon className="w-5 h-5" /> Perfect Score! Excellent job!
+                        </h4>
+                    </div>
+                )}
+
+                <div className="text-center">
+                    <button onClick={onRetry} className="px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg">
+                        Làm lại / Try Again
+                    </button>
+                </div>
+            </div>
+        );
+    };
+
+    const renderQuizResults = () => {
+        const resultItems: ResultItem[] = quizQuestions.map(q => ({
+            word: q.item,
+            userAnswer: q.userAnswer,
+            isCorrect: q.userAnswer === q.item.vietnamese
+        }));
+        return renderResultsBoard("Quiz Complete!", resultItems, startQuizSession);
+    };
+
+    const renderAudioChoiceResults = () => {
+        const resultItems: ResultItem[] = audioChoiceQuestions.map(q => ({
+            word: q.item,
+            userAnswer: q.userAnswer,
+            isCorrect: q.userAnswer === q.item.word
+        }));
+        return renderResultsBoard("Nghe & Chọn Complete!", resultItems, startAudioChoiceGame);
+    };
 
     const renderAudioChoice = () => {
         if (audioChoiceQuestions.length === 0) return null;
@@ -648,6 +724,10 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
 
         return (
             <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
+                <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">Nghe & Chọn</h3>
+                    <span className="font-semibold text-slate-500">{currentAudioChoiceIndex + 1} / {audioChoiceQuestions.length}</span>
+                </div>
                 <div className="mb-8">
                     <AudioPlayer audioScript={currentQuestion.item.word} autoPlay={true} />
                 </div>
@@ -748,7 +828,7 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
         
         return (
             <div className="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
-                <h3 className="text-xl font-bold text-slate-800 text-center mb-4">Matching Game (Round {matchingTurn + 1})</h3>
+                <h3 className="text-xl font-bold text-slate-800 text-center mb-4">Matching Game (Round {matchingTurn + 1} / {Math.ceil(fullMatchingDeck.length / WORDS_PER_MATCHING_TURN)})</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {matchingGridItems.map((gridItem, index) => {
                         const isMatched = matchedPairs.includes(gridItem.item.word);
@@ -830,15 +910,14 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
         );
     };
 
-    const renderScramblerResults = () => (
-        <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 text-center">
-            <h3 className="text-2xl font-bold text-slate-800">Scrambler Complete!</h3>
-            <p className="text-6xl font-bold text-blue-600 my-4">{scramblerScore} / {scramblerQuestions.length}</p>
-            <button onClick={startScramblerGame} className="mt-8 px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors">
-                Try Again
-            </button>
-        </div>
-    );
+    const renderScramblerResults = () => {
+        const resultItems: ResultItem[] = scramblerQuestions.map(q => ({
+            word: q.original,
+            userAnswer: q.userAnswer,
+            isCorrect: q.isCorrect === true
+        }));
+        return renderResultsBoard("Scrambler Complete!", resultItems, startScramblerGame);
+    };
 
     const renderSpellingRecall = () => {
         if (spellingQuestions.length === 0) return null;
@@ -888,15 +967,14 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
         );
     };
     
-    const renderSpellingResults = () => (
-        <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 text-center">
-            <h3 className="text-2xl font-bold text-slate-800">Spelling Practice Complete!</h3>
-            <p className="text-6xl font-bold text-blue-600 my-4">{spellingScore} / {spellingQuestions.length}</p>
-            <button onClick={startSpellingGame} className="mt-8 px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors">
-                Play Again
-            </button>
-        </div>
-    );
+    const renderSpellingResults = () => {
+        const resultItems: ResultItem[] = spellingQuestions.map(q => ({
+            word: q.original,
+            userAnswer: q.userAnswer,
+            isCorrect: q.isCorrect === true
+        }));
+        return renderResultsBoard("Spelling Practice Complete!", resultItems, startSpellingGame);
+    };
 
     const renderAudioDictation = () => {
         if (audioDictationQuestions.length === 0) return null;
@@ -952,15 +1030,14 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
         );
     };
 
-    const renderAudioDictationResults = () => (
-         <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 text-center">
-            <h3 className="text-2xl font-bold text-slate-800">Audio Dictation Complete!</h3>
-            <p className="text-6xl font-bold text-blue-600 my-4">{audioDictationScore} / {audioDictationQuestions.length}</p>
-            <button onClick={startAudioDictationGame} className="mt-8 px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors">
-                Play Again
-            </button>
-        </div>
-    );
+    const renderAudioDictationResults = () => {
+        const resultItems: ResultItem[] = audioDictationQuestions.map(q => ({
+            word: q.original,
+            userAnswer: q.userAnswer,
+            isCorrect: q.isCorrect === true
+        }));
+        return renderResultsBoard("Audio Dictation Complete!", resultItems, startAudioDictationGame);
+    };
 
     const renderDefinitionMatch = () => {
         if (isDMatchGameFinished) {
@@ -989,7 +1066,7 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
 
         return (
             <div className="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
-                <h3 className="text-xl font-bold text-slate-800 text-center mb-4">Definition Match (Round {dMatchTurn + 1})</h3>
+                <h3 className="text-xl font-bold text-slate-800 text-center mb-4">Definition Match (Round {dMatchTurn + 1} / {Math.ceil(fullDMatchDeck.length / WORDS_PER_DMATCH_TURN)})</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-3">
                         {dMatchWords.map((wordItem, index) => {
@@ -1067,7 +1144,7 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
 
                 {mode === 'flashcards' && renderFlashcards()}
                 {mode === 'quiz' && (isQuizSessionFinished ? renderQuizResults() : renderQuiz())}
-                {mode === 'audio_choice' && renderAudioChoice()}
+                {mode === 'audio_choice' && (isAudioChoiceSessionFinished ? renderAudioChoiceResults() : renderAudioChoice())}
                 {mode === 'matching_game' && renderMatchingGame()}
                 {mode === 'scrambler' && (isScramblerSessionFinished ? renderScramblerResults() : renderScrambler())}
                 {mode === 'spelling_recall' && (isSpellingSessionFinished ? renderSpellingResults() : renderSpellingRecall())}
