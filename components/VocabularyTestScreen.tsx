@@ -7,6 +7,7 @@ import AudioPlayer from './AudioPlayer';
 type StudyMode = 'flashcards' | 'quiz' | 'matching_game' | 'scrambler' | 'spelling_recall' | 'audio_dictation' | 'definition_match' | 'audio_choice';
 
 interface QuizQuestion {
+    item: VocabItem; // Store the original VocabItem
     questionText: string; // The definition
     options: string[]; // Array of words
     correctAnswer: string; // The correct word
@@ -120,6 +121,7 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
             const distractors = shuffleArray(wordsForSession.filter((w: VocabItem) => w.word !== correctItem.word)).slice(0, 3).map((d: VocabItem) => d.word);
             const options = shuffleArray([correctItem.word, ...distractors]);
             return {
+                item: correctItem,
                 questionText: correctItem.definition,
                 options: options,
                 correctAnswer: correctItem.word,
@@ -704,7 +706,7 @@ const VocabularyTestScreen: React.FC<{ testData: VocabularyTest, onBack: () => v
         const resultItems: ResultItem[] = quizQuestions.map(q => ({
             word: q.item,
             userAnswer: q.userAnswer,
-            isCorrect: q.userAnswer === q.item.vietnamese
+            isCorrect: q.userAnswer === q.item.word
         }));
         return renderResultsBoard("Quiz Complete!", resultItems, startQuizSession);
     };
