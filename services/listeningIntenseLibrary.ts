@@ -1,4 +1,14 @@
-import { ListeningIntenseTestData, ListeningIntenseConversation, ListeningIntenseSentence } from '../types';
+import { ListeningIntenseTestData, ListeningIntenseConversation, ListeningIntenseSentence, LibraryDictationExercise } from '../types';
+import { dictationTest1Data } from './dictation/dictationTest1';
+import { dictationTest2Data } from './dictation/dictationTest2';
+import { dictationTest3Data } from './dictation/dictationTest3';
+import { dictationTest4Data } from './dictation/dictationTest4';
+import { dictationTest5Data } from './dictation/dictationTest5';
+import { dictationTest6Data } from './dictation/dictationTest6';
+import { dictationTest7Data } from './dictation/dictationTest7';
+import { dictationTest8Data } from './dictation/dictationTest8';
+import { dictationTest9Data } from './dictation/dictationTest9';
+import { dictationTest10Data } from './dictation/dictationTest10';
 
 // Helper to split paragraph into sentences and then words
 const processText = (text: string, baseId: number): ListeningIntenseSentence[] => {
@@ -673,17 +683,36 @@ const processPart = (raw: RawPartData[]): ListeningIntenseConversation[] => raw.
     sentences: processText(item.text, item.id)
 }));
 
+const processDictationPart = (dictationPart: LibraryDictationExercise[]): ListeningIntenseConversation[] => dictationPart.map(item => ({
+    id: item.id,
+    title: item.title,
+    sentences: processText(item.fullText, item.id)
+}));
+
 export const allListeningIntenseTests: ListeningIntenseTestData[] = [
-    { id: 1, title: "Test 1", part1: processPart(test1Part1Raw), part2: processPart(test1Part2Raw), part3: processPart(test1Part3Raw), part4: processPart(test1Part4Raw) },
-    { id: 2, title: "Test 2", part1: processPart(test2Part1Raw), part2: processPart(test2Part2Raw), part3: processPart(test2Part3Raw), part4: processPart(test2Part4Raw) },
-    { id: 3, title: "Test 3", part1: processPart(test3Part1Raw), part2: processPart(test3Part2Raw), part3: processPart(test3Part3Raw), part4: processPart(test3Part4Raw) },
-    { id: 4, title: "Test 4", part1: processPart(test4Part1Raw), part2: processPart(test4Part2Raw), part3: processPart(test4Part3Raw), part4: processPart(test4Part4Raw) },
-    { id: 5, title: "Test 5", part1: processPart(test5Part1Raw), part2: processPart(test5Part2Raw), part3: processPart(test5Part3Raw), part4: processPart(test5Part4Raw) },
-    { id: 6, title: "Test 6", part1: processPart(test6Part1Raw), part2: processPart(test6Part2Raw), part3: processPart(test6Part3Raw), part4: processPart(test6Part4Raw) },
-    { id: 7, title: "Test 7", part1: processPart(test7Part1Raw), part2: processPart(test7Part2Raw), part3: processPart(test7Part3Raw), part4: processPart(test7Part4Raw) },
-    { id: 8, title: "Test 8", part1: processPart(test8Part1Raw), part2: processPart(test8Part2Raw), part3: processPart(test8Part3Raw), part4: processPart(test8Part4Raw) },
-    { id: 9, title: "Test 9", part1: processPart(test9Part1Raw), part2: processPart(test9Part2Raw), part3: processPart(test9Part3Raw), part4: processPart(test9Part4Raw) },
-    { id: 10, title: "Test 10", part1: processPart(test10Part1Raw), part2: processPart(test10Part2Raw), part3: processPart(test10Part3Raw), part4: processPart(test10Part4Raw) },
+    // 2026 Tests (Existing)
+    { id: 1, title: "Test 1", group: "2026", part1: processPart(test1Part1Raw), part2: processPart(test1Part2Raw), part3: processPart(test1Part3Raw), part4: processPart(test1Part4Raw) },
+    { id: 2, title: "Test 2", group: "2026", part1: processPart(test2Part1Raw), part2: processPart(test2Part2Raw), part3: processPart(test2Part3Raw), part4: processPart(test2Part4Raw) },
+    { id: 3, title: "Test 3", group: "2026", part1: processPart(test3Part1Raw), part2: processPart(test3Part2Raw), part3: processPart(test3Part3Raw), part4: processPart(test3Part4Raw) },
+    { id: 4, title: "Test 4", group: "2026", part1: processPart(test4Part1Raw), part2: processPart(test4Part2Raw), part3: processPart(test4Part3Raw), part4: processPart(test4Part4Raw) },
+    { id: 5, title: "Test 5", group: "2026", part1: processPart(test5Part1Raw), part2: processPart(test5Part2Raw), part3: processPart(test5Part3Raw), part4: processPart(test5Part4Raw) },
+    { id: 6, title: "Test 6", group: "2026", part1: processPart(test6Part1Raw), part2: processPart(test6Part2Raw), part3: processPart(test6Part3Raw), part4: processPart(test6Part4Raw) },
+    { id: 7, title: "Test 7", group: "2026", part1: processPart(test7Part1Raw), part2: processPart(test7Part2Raw), part3: processPart(test7Part3Raw), part4: processPart(test7Part4Raw) },
+    { id: 8, title: "Test 8", group: "2026", part1: processPart(test8Part1Raw), part2: processPart(test8Part2Raw), part3: processPart(test8Part3Raw), part4: processPart(test8Part4Raw) },
+    { id: 9, title: "Test 9", group: "2026", part1: processPart(test9Part1Raw), part2: processPart(test9Part2Raw), part3: processPart(test9Part3Raw), part4: processPart(test9Part4Raw) },
+    { id: 10, title: "Test 10", group: "2026", part1: processPart(test10Part1Raw), part2: processPart(test10Part2Raw), part3: processPart(test10Part3Raw), part4: processPart(test10Part4Raw) },
+    
+    // 2024 Tests (New)
+    { id: 11, title: "Test 1", group: "2024", part1: processDictationPart(dictationTest1Data.part1), part2: processDictationPart(dictationTest1Data.part2), part3: processDictationPart(dictationTest1Data.part3), part4: processDictationPart(dictationTest1Data.part4) },
+    { id: 12, title: "Test 2", group: "2024", part1: processDictationPart(dictationTest2Data.part1), part2: processDictationPart(dictationTest2Data.part2), part3: processDictationPart(dictationTest2Data.part3), part4: processDictationPart(dictationTest2Data.part4) },
+    { id: 13, title: "Test 3", group: "2024", part1: processDictationPart(dictationTest3Data.part1), part2: processDictationPart(dictationTest3Data.part2), part3: processDictationPart(dictationTest3Data.part3), part4: processDictationPart(dictationTest3Data.part4) },
+    { id: 14, title: "Test 4", group: "2024", part1: processDictationPart(dictationTest4Data.part1), part2: processDictationPart(dictationTest4Data.part2), part3: processDictationPart(dictationTest4Data.part3), part4: processDictationPart(dictationTest4Data.part4) },
+    { id: 15, title: "Test 5", group: "2024", part1: processDictationPart(dictationTest5Data.part1), part2: processDictationPart(dictationTest5Data.part2), part3: processDictationPart(dictationTest5Data.part3), part4: processDictationPart(dictationTest5Data.part4) },
+    { id: 16, title: "Test 6", group: "2024", part1: processDictationPart(dictationTest6Data.part1), part2: processDictationPart(dictationTest6Data.part2), part3: processDictationPart(dictationTest6Data.part3), part4: processDictationPart(dictationTest6Data.part4) },
+    { id: 17, title: "Test 7", group: "2024", part1: processDictationPart(dictationTest7Data.part1), part2: processDictationPart(dictationTest7Data.part2), part3: processDictationPart(dictationTest7Data.part3), part4: processDictationPart(dictationTest7Data.part4) },
+    { id: 18, title: "Test 8", group: "2024", part1: processDictationPart(dictationTest8Data.part1), part2: processDictationPart(dictationTest8Data.part2), part3: processDictationPart(dictationTest8Data.part3), part4: processDictationPart(dictationTest8Data.part4) },
+    { id: 19, title: "Test 9", group: "2024", part1: processDictationPart(dictationTest9Data.part1), part2: processDictationPart(dictationTest9Data.part2), part3: processDictationPart(dictationTest9Data.part3), part4: processDictationPart(dictationTest9Data.part4) },
+    { id: 20, title: "Test 10", group: "2024", part1: processDictationPart(dictationTest10Data.part1), part2: processDictationPart(dictationTest10Data.part2), part3: processDictationPart(dictationTest10Data.part3), part4: processDictationPart(dictationTest10Data.part4) },
 ];
 
 export const getListeningIntenseTest = (id: number): ListeningIntenseTestData | undefined => {

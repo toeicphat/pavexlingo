@@ -124,6 +124,7 @@ export interface ListeningIntenseConversation {
 export interface ListeningIntenseTestData {
     id: number;
     title: string;
+    group: string;
     part1: ListeningIntenseConversation[];
     part2: ListeningIntenseConversation[];
     part3: ListeningIntenseConversation[];

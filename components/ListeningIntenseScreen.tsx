@@ -24,6 +24,12 @@ const ListeningIntenseScreen: React.FC<ListeningIntenseScreenProps> = ({ current
         }
     };
 
+    const groupedTests = allListeningIntenseTests.reduce((acc, test) => {
+        if (!acc[test.group]) acc[test.group] = [];
+        acc[test.group].push(test);
+        return acc;
+    }, {} as Record<string, ListeningIntenseTestData[]>);
+
     return (
         <div className="container mx-auto px-4 py-12">
             <div className="max-w-6xl mx-auto">
@@ -39,18 +45,23 @@ const ListeningIntenseScreen: React.FC<ListeningIntenseScreenProps> = ({ current
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-                    {allListeningIntenseTests.map(test => (
-                        <SelectionCard 
-                            key={test.id}
-                            title={test.title}
-                            description={`Luyện nghe chuyên sâu bài số ${test.id}.`}
-                            onClick={() => handleTestClick(test)}
-                            isComingSoon={false}
-                            isLocked={!currentUser && test.id !== 1}
-                        />
-                    ))}
-                </div>
+                {Object.keys(groupedTests).sort().reverse().map(group => (
+                    <div key={group} className="mb-12">
+                         <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-6 border-b border-slate-200 dark:border-slate-700 pb-2">{group}</h3>
+                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+                            {groupedTests[group].map(test => (
+                                <SelectionCard 
+                                    key={test.id}
+                                    title={test.title}
+                                    description={`Luyện nghe chuyên sâu ${test.title} ${group}.`}
+                                    onClick={() => handleTestClick(test)}
+                                    isComingSoon={false}
+                                    isLocked={!currentUser && test.id !== 1 && test.id !== 11}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                ))}
             </div>
 
             {/* Part Selection Modal */}
