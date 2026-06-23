@@ -906,8 +906,8 @@ const test8_186_200_words: VocabItem[] = [
 
 export const readingPart7IntenseVocabularyData: VocabularyPart = {
     id: 9,
-    title: "Reading Part 7 - Chuyên sâu",
-    description: "Vocabulary from advanced TOEIC Reading Part 7 passages for intensive classes.",
+    title: " Singanong - Part 7 - Chuyên sâu",
+    description: "Bộ từ vựng nâng cao được trích từ Part 7 sách Singanong 950.",
     tests: [
         { id: 901, title: "Test 1 (176-185)", words: test1_176_185_words },
         { id: 902, title: "Test 1 (186-200)", words: test1_186_200_words },

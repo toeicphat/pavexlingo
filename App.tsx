@@ -37,11 +37,14 @@ const mockUsers: User[] = [
     { username: 'thupham.241004@gmail.com', password: 'thidautoeic' },
     { username: 'thaovimk0902@gmail.com', password: 'thidautoeic' },
     { username: 'huongnguyenthi280604@gmail.com', password: 'thidautoeic' },
+    { username: 'tranthibichngoc1703@gmail.com', password: 'thidautoeic' },
 ];
 
 const shuffleArray = <T,>(array: T[]): T[] => {
     return [...array].sort(() => Math.random() - 0.5);
 };
+
+import { QuotesMarquee } from './components/QuotesMarquee';
 
 const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>(AppState.PracticeHub);
@@ -299,11 +302,12 @@ const App: React.FC = () => {
         <div className="bg-slate-50 dark:bg-slate-900 min-h-screen font-sans text-slate-900 dark:text-slate-200">
             <header className="bg-white dark:bg-slate-800 shadow-md border-b border-slate-200 dark:border-slate-700 sticky top-0 z-40">
                 <nav className="container mx-auto px-4 py-3 flex justify-between items-center">
-                    <div className="flex items-center gap-2 cursor-pointer" onClick={handleGoHome}>
+                    <div className="flex items-center gap-2 cursor-pointer flex-shrink-0" onClick={handleGoHome}>
                         <LogoIcon className="h-8 w-8 text-blue-600" />
-                        <span className="text-xl font-bold text-slate-800 dark:text-slate-100">Pavex Lingo</span>
+                        <span className="text-xl font-bold text-slate-800 dark:text-slate-100 hidden sm:block">Pavex Lingo</span>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <QuotesMarquee />
+                    <div className="flex items-center gap-4 flex-shrink-0">
                         <button 
                             onClick={() => setShowUpgradeModal(true)}
                             className="gold-bg p-[2px] rounded-lg shadow-sm flex items-center justify-center transition-transform hover:scale-105"
