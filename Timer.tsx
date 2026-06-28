@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { ClockIcon } from './icons';
+import { ClockIcon } from './components/icons';
 
 interface TimerProps {
   initialTime: number; // in seconds

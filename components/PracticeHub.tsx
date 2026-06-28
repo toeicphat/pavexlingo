@@ -10,6 +10,7 @@ interface PracticeHubProps {
 }
 
 const announcements = [
+  { date: '28/06/2026', time: '09:00', text: 'Đã thêm tính năng chọn lọc từ vựng muốn học trong 1 bộ & Lưu lại lịch sử luyện tập trong Nghe chuyên sâu' },
   { date: '17/06/2026', time: '09:00', text: 'Đã thêm tính năng nghe "ngẫu nhiên" trong chức năng Nghe chuyên sâu' },
   { date: '10/06/2026', time: '09:00', text: 'Đã mở khóa trải nghiệm một số phần của Nghe chép chính tả, Ngữ pháp và Nghe chuyên sâu' },
   { date: '21/02/2026', time: '09:00', text: 'Đã cập nhật bộ từ vựng mới của bộ Từ Vựng Reading 2026' },

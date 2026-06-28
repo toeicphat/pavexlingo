@@ -18,6 +18,7 @@ export enum AppState {
     GrammarRandomTest = 'GRAMMAR_RANDOM_TEST',
     ListeningIntenseHub = 'LISTENING_INTENSE_HUB',
     ListeningIntensePractice = 'LISTENING_INTENSE_PRACTICE',
+    ListeningReflexPractice = 'LISTENING_REFLEX_PRACTICE',
     Login = 'LOGIN',
     Guide = 'GUIDE',
 }

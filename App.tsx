@@ -14,6 +14,7 @@ import LoginScreen from './components/LoginScreen';
 import GuideScreen from './components/GuideScreen';
 import ListeningIntenseScreen from './components/ListeningIntenseScreen';
 import ListeningIntensePracticeScreen from './components/ListeningIntensePracticeScreen';
+import ListeningReflexPracticeScreen from './components/ListeningReflexPracticeScreen';
 import { AppState, VocabularyTest, VocabularyPart, User, DictationMode, TestData, UserAnswers } from './types';
 import { getVocabularyPart, getVocabularyTest } from './services/vocabularyLibrary';
 import { allDictationTests, getDictationExercisesForParts } from './services/dictationLibrary';
@@ -39,6 +40,7 @@ const mockUsers: User[] = [
     { username: 'huongnguyenthi280604@gmail.com', password: 'thidautoeic' },
     { username: 'tranthibichngoc1703@gmail.com', password: 'thidautoeic' },
     { username: 'lengochuyen8234@gmail.com', password: 'thidautoeic' },
+    { username: 'dinhxuannam192004@gmail.com', password: 'thidautoeic' },
 ];
 
 const shuffleArray = <T,>(array: T[]): T[] => {
@@ -194,6 +196,14 @@ const App: React.FC = () => {
         }
     }, []);
 
+    const handleSelectReflexTest = useCallback((testId: number) => {
+        const test = getListeningIntenseTest(testId);
+        if (test) {
+            setListeningIntenseData(test.part2);
+            setAppState(AppState.ListeningReflexPractice);
+        }
+    }, []);
+
     const handleBackToListeningIntenseHub = useCallback(() => {
         setListeningIntenseData(null);
         setAppState(AppState.ListeningIntenseHub);
@@ -289,11 +299,15 @@ const App: React.FC = () => {
                         currentUser={currentUser}
                         onBack={handleGoHome} 
                         onSelectPart={handleSelectListeningIntensePart} 
+                        onSelectReflexTest={handleSelectReflexTest}
                     />
                 );
             case AppState.ListeningIntensePractice:
                 if (!listeningIntenseData) return null;
                 return <ListeningIntensePracticeScreen data={listeningIntenseData} onBack={handleBackToListeningIntenseHub} />;
+            case AppState.ListeningReflexPractice:
+                if (!listeningIntenseData) return null;
+                return <ListeningReflexPracticeScreen data={listeningIntenseData} onBack={handleBackToListeningIntenseHub} />;
             default:
                 return <PracticeHub {...practiceHubProps} />;
         }
