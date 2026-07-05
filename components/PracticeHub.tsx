@@ -107,7 +107,10 @@ const PracticeHub: React.FC<PracticeHubProps> = ({
                  {announcements.map((ann, idx) => (
                       <div key={idx} className="pb-3 border-b border-slate-100 dark:border-slate-700 last:border-0">
                         <div className="flex items-center justify-between mb-1">
-                             <span className="text-[10px] font-bold text-blue-600 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded uppercase tracking-wider">{ann.date}</span>
+                             <div className="flex items-center gap-2">
+                                 {idx === 0 && <span className="text-[10px] font-black text-red-600 bg-red-100 dark:bg-red-900/30 px-2 py-0.5 rounded uppercase tracking-wider animate-pulse">MỚI</span>}
+                                 <span className="text-[10px] font-bold text-blue-600 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded uppercase tracking-wider">{ann.date}</span>
+                             </div>
                              <span className="text-[10px] text-slate-400 font-medium">{ann.time}</span>
                         </div>
                         <p className="text-sm text-slate-700 dark:text-slate-300 font-medium leading-relaxed">{ann.text}</p>
