@@ -25,8 +25,12 @@ import {
   XCircleIcon,
   SparklesIcon,
   CheckCircleIcon,
+  BubbleIcon,
+  FlappyBirdIcon,
 } from "./icons";
 import AudioPlayer from "./AudioPlayer";
+import { BubbleGame } from "./BubbleGame";
+import { FlappyBirdGame } from "./FlappyBirdGame";
 
 type StudyMode =
   | "flashcards"
@@ -36,7 +40,9 @@ type StudyMode =
   | "spelling_recall"
   | "audio_dictation"
   | "definition_match"
-  | "audio_choice";
+  | "audio_choice"
+  | "bubble"
+  | "flappybird";
 
 interface QuizQuestion {
   item: VocabItem; // Store the original VocabItem
@@ -1621,7 +1627,7 @@ const VocabularyTestScreen: React.FC<{
           <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 text-center">
             Chế độ luyện tập
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6">
             <ModeButton
               active={mode === "flashcards"}
               onClick={() => setMode("flashcards")}
@@ -1670,6 +1676,18 @@ const VocabularyTestScreen: React.FC<{
               icon={DictationModeIcon}
               label="Dictation"
             />
+            <ModeButton
+              active={mode === "bubble"}
+              onClick={() => setMode("bubble")}
+              icon={BubbleIcon}
+              label="Bubble Game"
+            />
+            <ModeButton
+              active={mode === "flappybird"}
+              onClick={() => setMode("flappybird")}
+              icon={FlappyBirdIcon}
+              label="Flappy Bird"
+            />
           </div>
         </div>
 
@@ -1680,6 +1698,18 @@ const VocabularyTestScreen: React.FC<{
         )}
 
         {mode === "flashcards" && renderFlashcards()}
+        {mode === "bubble" && (
+          <BubbleGame 
+            vocabData={wordsForSession} 
+            onBack={() => setMode("flashcards")} 
+          />
+        )}
+        {mode === "flappybird" && (
+          <FlappyBirdGame 
+            vocabData={wordsForSession} 
+            onBack={() => setMode("flashcards")} 
+          />
+        )}
         {mode === "quiz" &&
           (isQuizSessionFinished ? renderQuizResults() : renderQuiz())}
         {mode === "audio_choice" &&

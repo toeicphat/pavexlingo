@@ -10,6 +10,7 @@ interface PracticeHubProps {
 }
 
 const announcements = [
+  { date: '19/07/2026', time: '11:00', text: 'Xuất hiện 2 chế độ game Bubble & Flappy Bird trong mục luyện tập từ vựng. Hãy trải nghiệm!' },
   { date: '28/06/2026', time: '09:00', text: 'Đã thêm tính năng chọn lọc từ vựng muốn học trong 1 bộ & Lưu lại lịch sử luyện tập trong Nghe chuyên sâu' },
   { date: '17/06/2026', time: '09:00', text: 'Đã thêm tính năng nghe "ngẫu nhiên" trong chức năng Nghe chuyên sâu' },
   { date: '10/06/2026', time: '09:00', text: 'Đã mở khóa trải nghiệm một số phần của Nghe chép chính tả, Ngữ pháp và Nghe chuyên sâu' },
