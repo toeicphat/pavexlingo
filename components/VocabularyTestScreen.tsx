@@ -108,6 +108,7 @@ const VocabularyTestScreen: React.FC<{
   const [currentQuizIndex, setCurrentQuizIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [isQuizSessionFinished, setIsQuizSessionFinished] = useState(false);
+  const [quizDirection, setQuizDirection] = useState<"en-vi" | "vi-en">("en-vi");
 
   // State for Audio Choice
   const [audioChoiceQuestions, setAudioChoiceQuestions] = useState<
@@ -186,19 +187,22 @@ const VocabularyTestScreen: React.FC<{
         wordsForSession.filter((w: VocabItem) => w.word !== correctItem.word),
       )
         .slice(0, 3)
-        .map((d: VocabItem) => d.word);
-      const options = shuffleArray([correctItem.word, ...distractors]);
+        .map((d: VocabItem) => quizDirection === "en-vi" ? d.definition : d.word);
+      const options = shuffleArray([
+        quizDirection === "en-vi" ? correctItem.definition : correctItem.word,
+        ...distractors,
+      ]);
       return {
         item: correctItem,
-        questionText: correctItem.definition,
+        questionText: quizDirection === "en-vi" ? correctItem.word : correctItem.definition,
         options: options,
-        correctAnswer: correctItem.word,
+        correctAnswer: quizDirection === "en-vi" ? correctItem.definition : correctItem.word,
         userAnswer: null,
         isCorrect: null,
       };
     });
     setQuizQuestions(questions);
-  }, [wordsForSession]);
+  }, [wordsForSession, quizDirection]);
 
   const startQuizSession = useCallback(() => {
     generateQuizQuestions();
@@ -458,11 +462,8 @@ const VocabularyTestScreen: React.FC<{
       setScore((prev) => prev + 1);
     }
 
-    const vocabItem = wordsForSession.find(
-      (w) => w.word === currentQuestion.correctAnswer,
-    );
-    if (vocabItem) {
-      handleWordPractice(vocabItem, isCorrect ? "good" : "hard");
+    if (currentQuestion.item) {
+      handleWordPractice(currentQuestion.item, isCorrect ? "good" : "hard");
     }
 
     const updatedQuestions = [...quizQuestions];
@@ -817,13 +818,21 @@ const VocabularyTestScreen: React.FC<{
     const currentQuestion = quizQuestions[currentQuizIndex];
     return (
       <div className="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
           <h3 className="text-xl font-bold text-slate-800">
             Multiple Choice Quiz
           </h3>
-          <span className="font-semibold text-slate-500">
-            {currentQuizIndex + 1} / {quizQuestions.length}
-          </span>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setQuizDirection(prev => prev === "en-vi" ? "vi-en" : "en-vi")}
+              className="px-3 py-1.5 bg-blue-100 text-blue-700 font-bold rounded-lg text-sm hover:bg-blue-200 transition-colors active:bg-blue-300"
+            >
+              {quizDirection === "en-vi" ? "Anh ➔ Việt" : "Việt ➔ Anh"}
+            </button>
+            <span className="font-semibold text-slate-500">
+              {currentQuizIndex + 1} / {quizQuestions.length}
+            </span>
+          </div>
         </div>
         <div className="p-8 bg-slate-100 rounded-lg text-center min-h-[120px] flex items-center justify-center">
           <p className="text-lg text-slate-700">
@@ -961,7 +970,7 @@ const VocabularyTestScreen: React.FC<{
     const resultItems: ResultItem[] = quizQuestions.map((q) => ({
       word: q.item,
       userAnswer: q.userAnswer,
-      isCorrect: q.userAnswer === q.item.word,
+      isCorrect: q.userAnswer === q.correctAnswer,
     }));
     return renderResultsBoard("Quiz Complete!", resultItems, startQuizSession);
   };
