@@ -26,7 +26,7 @@ const mockUsers: User[] = [
     { username: 'admin', password: 'phattoeic', role: 'admin' },
     { username: 'tester', password: '123456', role: 'tester' },
     { username: 'hoangphuctayninh1708@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
-    { username: 'luongzattu800@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
+    { username: 'tranhuynhlt46@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
     { username: 'minhchungsuke121@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
     { username: 'nttuephuong.2211@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
     { username: 'nguyenkimkhanh278@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },

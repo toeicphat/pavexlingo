@@ -15,7 +15,7 @@ import {
   GridIcon,
   TypeIcon,
   HeadphoneIcon,
-  LinkIcon,
+  LinkIcon, RainIcon,
   FlipIcon,
   RefreshIcon,
   TestQuizIcon,
@@ -29,6 +29,7 @@ import {
   FlappyBirdIcon,
 } from "./icons";
 import AudioPlayer from "./AudioPlayer";
+import { WordRainGame } from "./WordRainGame";
 import { BubbleGame } from "./BubbleGame";
 import { FlappyBirdGame } from "./FlappyBirdGame";
 
@@ -39,7 +40,7 @@ type StudyMode =
   | "scrambler"
   | "spelling_recall"
   | "audio_dictation"
-  | "definition_match"
+  | "word_rain"
   | "audio_choice"
   | "bubble"
   | "flappybird";
@@ -410,7 +411,7 @@ const VocabularyTestScreen: React.FC<{
     if (mode === "scrambler") startScramblerGame();
     if (mode === "spelling_recall") startSpellingGame();
     if (mode === "audio_dictation") startAudioDictationGame();
-    if (mode === "definition_match") startDMatchGame();
+    if (mode === "word_rain") startDMatchGame();
   }, [
     mode,
     wordsForSession,
@@ -1662,10 +1663,10 @@ const VocabularyTestScreen: React.FC<{
               label="Matching"
             />
             <ModeButton
-              active={mode === "definition_match"}
-              onClick={() => setMode("definition_match")}
-              icon={LinkIcon}
-              label="Def Match"
+              active={mode === "word_rain"}
+              onClick={() => setMode("word_rain")}
+              icon={RainIcon}
+              label="Word Rain"
             />
             <ModeButton
               active={mode === "scrambler"}
@@ -1738,7 +1739,7 @@ const VocabularyTestScreen: React.FC<{
           (isAudioDictationSessionFinished
             ? renderAudioDictationResults()
             : renderAudioDictation())}
-        {mode === "definition_match" && renderDefinitionMatch()}
+        {mode === "word_rain" && <WordRainGame vocabData={wordsForSession} testTitle={testData.title} onBack={() => setMode("flashcards")} />}
       </div>
     </div>
   );

@@ -458,3 +458,11 @@ export const FlappyBirdIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) =
 	S379.84,58.789,384.267,58.789z"/>
 </svg>
 );
+
+export const RainIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <path d="M20.7,10.5A4,4,0,0,1,17,13H6a3,3,0,0,1-2.6-1.5,3,3,0,0,1,3.68-1.29,5,5,0,0,1,9-2.09A4.08,4.08,0,0,1,17,8,4,4,0,0,1,20.7,10.5Z" fill="currentColor" opacity="0.3" />
+    <path d="M21,9a3.76,3.76,0,0,1-.3,1.5A4,4,0,0,1,17,13H6A3,3,0,1,1,7.08,7.21a5,5,0,0,1,9-2.09A4.08,4.08,0,0,1,17,5,4,4,0,0,1,21,9Z" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+    <path d="M6,17v2m4-2v4m4-4v2m4-2v4" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+  </svg>
+);
