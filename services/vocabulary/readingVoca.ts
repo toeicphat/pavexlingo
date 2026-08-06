@@ -1,6 +1,22 @@
 import { VocabItem, VocabularyPart } from '../../types';
 
-const test1_words: VocabItem[] = [];
+const test1_words: VocabItem[] = [
+    { word: "Schedule", definition: "Lịch trình / Sắp xếp", example: "" },
+    { word: "Meeting", definition: "Cuộc họp", example: "" },
+    { word: "Staff", definition: "Nhân viên", example: "" },
+    { word: "Conference", definition: "Hội nghị", example: "" },
+    { word: "Firm", definition: "Công ty", example: "" },
+    { word: "Preferred", definition: "Được ưu tiên / Ưa thích", example: "" },
+    { word: "Workday", definition: "Ngày làm việc", example: "" },
+    { word: "Time zones", definition: "Múi giờ", example: "" },
+    { word: "Interoffice", definition: "Giữa các văn phòng", example: "" },
+    { word: "Reference", definition: "Tham khảo", example: "" },
+    { word: "Underlined", definition: "Được gạch chân (nhấn mạnh)", example: "" },
+    { word: "Administrative", definition: "Thuộc về hành chính", example: "" },
+    { word: "Assistant", definition: "Trợ lý", example: "" },
+    { word: "Tool", definition: "Công cụ (hỗ trợ lịch)", example: "" },
+    { word: "Noon", definition: "Buổi trưa (12:00)", example: "" }
+];
 
 const test2_words: VocabItem[] = [];
 
@@ -31,11 +47,33 @@ const test7_words: VocabItem[] = [
     { word: "Development", definition: "Sự phát triển", example: "" },
     { word: "Participant", definition: "Người tham gia", example: "" },
     { word: "Rate", definition: "Đánh giá", example: "" },
-    { word: "Pleasant", definition: "Dễ chịu", example: "" },
+    { word: "Pleasant", definition: "Dễ chịu, hài lòng", example: "" },
     { word: "Sample", definition: "Mẫu", example: "" }
 ];
 
-const test8_words: VocabItem[] = [];
+const test8_words: VocabItem[] = [
+    { word: "Mission", definition: "Sứ mệnh / Nhiệm vụ", example: "" },
+    { word: "Provide", definition: "Cung cấp", example: "" },
+    { word: "Founded", definition: "Được thành lập", example: "" },
+    { word: "Request", definition: "Yêu cầu", example: "" },
+    { word: "Options", definition: "Lựa chọn", example: "" },
+    { word: "Minimum", definition: "Tối thiểu", example: "" },
+    { word: "Quality", definition: "Chất lượng", example: "" },
+    { word: "Experience", definition: "Kinh nghiệm / Trải nghiệm", example: "" },
+    { word: "Satisfying", definition: "Đem lại sự thỏa mãn / Hài lòng", example: "" },
+    { word: "Fresh", definition: "Tươi / Mới", example: "" },
+    { word: "Delicious", definition: "Ngon miệng", example: "" },
+    { word: "Serve", definition: "Phục vụ", example: "" },
+    { word: "Meal", definition: "Bữa ăn", example: "" },
+    { word: "Cost", definition: "Chi phí", example: "" },
+    { word: "Catering", definition: "Dịch vụ ăn uống / Cung cấp tiệc", example: "" },
+    { word: "Ingredients", definition: "Thành phần / Nguyên liệu", example: "" },
+    { word: "Vegetarian", definition: "Người ăn chay / Chay", example: "" },
+    { word: "Growers", definition: "Người trồng trọt", example: "" },
+    { word: "Adapted", definition: "Được điều chỉnh / Thích nghi", example: "" },
+    { word: "Operated", definition: "Được vận hành / Hoạt động", example: "" },
+    { word: "Estimate", definition: "Ước tính / Báo giá", example: "" }
+];
 
 const test9_words: VocabItem[] = [];
 
@@ -46,14 +84,14 @@ export const readingComprehensiveVocabulary: VocabularyPart = {
     title: "Reading theo Khóa học",
     description: "Từ vựng Reading phổ biến, có tỉ lệ xuất hiện cao",
     tests: [
-        { id: 2001, title: "Test 1", words: test1_words },
+        { id: 2001, title: "T1 - P7(149-150)", words: test1_words },
         { id: 2002, title: "Test 2", words: test2_words },
         { id: 2003, title: "Test 3", words: test3_words },
         { id: 2004, title: "Test 4", words: test4_words },
         { id: 2005, title: "Test 5", words: test5_words },
         { id: 2006, title: "Test 6", words: test6_words },
         { id: 2007, title: "T2 - P7(176-180)", words: test7_words },
-        { id: 2008, title: "Test 8", words: test8_words },
+        { id: 2008, title: "T3 - P7(168-171)", words: test8_words },
         { id: 2009, title: "Test 9", words: test9_words },
         { id: 2010, title: "Test 10", words: test10_words },
     ]

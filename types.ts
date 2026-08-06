@@ -1,6 +1,8 @@
 export interface User {
     username: string;
     password?: string;
+    created?: string;
+    role?: 'admin' | 'tester' | 'student';
 }
 
 export type DictationMode = 'easy' | 'hard';
@@ -21,6 +23,7 @@ export enum AppState {
     ListeningReflexPractice = 'LISTENING_REFLEX_PRACTICE',
     Login = 'LOGIN',
     Guide = 'GUIDE',
+    Profile = 'PROFILE',
 }
 
 // For Listening & Translation (within Vocabulary)

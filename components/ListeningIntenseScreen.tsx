@@ -1,3 +1,4 @@
+import { isAccountExpired } from "../services/authUtils";
 import React, { useState } from "react";
 import SelectionCard from "./SelectionCard";
 import { ArrowLeftIcon, XCircleIcon } from "./icons";
@@ -116,7 +117,7 @@ const ListeningIntenseScreen: React.FC<ListeningIntenseScreenProps> = ({
                           : onSelectReflexTest(test.id)
                       }
                       isComingSoon={false}
-                      isLocked={!currentUser && test.id !== 1 && test.id !== 11}
+                      isLocked={(!currentUser || isAccountExpired(currentUser)) && test.id !== 1 && test.id !== 11}
                     />
                   ))}
                 </div>

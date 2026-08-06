@@ -15,7 +15,7 @@ const SelectionCard: React.FC<SelectionCardProps> = ({ title, description, onCli
     const handleClick = () => {
         if (isComingSoon) return;
         if (isLocked) {
-            alert('Bạn cần đăng nhập để sử dụng tính năng này.');
+            alert('Bạn cần đăng nhập để sử dụng tính năng này, hoặc tài khoản của bạn đã hết hạn.');
             return;
         }
         onClick();

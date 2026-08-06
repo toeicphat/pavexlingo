@@ -11,6 +11,7 @@ import GrammarScreen from './components/GrammarScreen';
 import GrammarTopicScreen from './components/GrammarTopicScreen';
 import TestScreen from './components/TestScreen';
 import LoginScreen from './components/LoginScreen';
+import ProfileScreen from './components/ProfileScreen';
 import GuideScreen from './components/GuideScreen';
 import ListeningIntenseScreen from './components/ListeningIntenseScreen';
 import ListeningIntensePracticeScreen from './components/ListeningIntensePracticeScreen';
@@ -22,25 +23,25 @@ import { getListeningIntenseTest } from './services/listeningIntenseLibrary';
 import { LogoIcon, XCircleIcon } from './components/icons';
 
 const mockUsers: User[] = [
-    { username: 'admin', password: 'phattoeic' },
-    { username: 'tester', password: '123456' },
-    { username: 'hoangphuctayninh1708@gmail.com', password: 'thidautoeic' },
-    { username: 'luongzattu800@gmail.com', password: 'thidautoeic' },
-    { username: 'minhchungsuke121@gmail.com', password: 'thidautoeic' },
-    { username: 'nttuephuong.2211@gmail.com', password: 'thidautoeic' },
-    { username: 'nguyenkimkhanh278@gmail.com', password: 'thidautoeic' },
-    { username: 'minhquan28032004@gmail.com', password: 'thidautoeic' },
-    { username: 'giangtuyetcutes1@gmail.com', password: 'thidautoeic' },
-    { username: 'trangnt8905@gmail.com', password: 'thidautoeic' },
-    { username: 'luongthimo357@gmail.com', password: 'thidautoeic' },
-    { username: 'thaotrang27771@gmail.com', password: 'thidautoeic' },
-    { username: 'trananhthu1802@gmail.com', password: 'thidautoeic' },
-    { username: 'thupham.241004@gmail.com', password: 'thidautoeic' },
-    { username: 'thaovimk0902@gmail.com', password: 'thidautoeic' },
-    { username: 'huongnguyenthi280604@gmail.com', password: 'thidautoeic' },
-    { username: 'tranthibichngoc1703@gmail.com', password: 'thidautoeic' },
-    { username: 'lengochuyen8234@gmail.com', password: 'thidautoeic' },
-    { username: 'dinhxuannam192004@gmail.com', password: 'thidautoeic' },
+    { username: 'admin', password: 'phattoeic', role: 'admin' },
+    { username: 'tester', password: '123456', role: 'tester' },
+    { username: 'hoangphuctayninh1708@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
+    { username: 'luongzattu800@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
+    { username: 'minhchungsuke121@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
+    { username: 'nttuephuong.2211@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
+    { username: 'nguyenkimkhanh278@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
+    { username: 'minhquan28032004@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
+    { username: 'giangtuyetcutes1@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
+    { username: 'trangnt8905@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
+    { username: 'luongthimo357@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
+    { username: 'thaotrang27771@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
+    { username: 'trananhthu1802@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
+    { username: 'thupham.241004@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
+    { username: 'thaovimk0902@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
+    { username: 'huongnguyenthi280604@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
+    { username: 'tranthibichngoc1703@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
+    { username: 'lengochuyen8234@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
+    { username: 'dinhxuannam192004@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
 ];
 
 const shuffleArray = <T,>(array: T[]): T[] => {
@@ -234,6 +235,15 @@ const App: React.FC = () => {
                 return <PracticeHub {...practiceHubProps} />;
             case AppState.Login:
                 return <LoginScreen onLoginSuccess={handleLoginSuccess} users={mockUsers} />;
+            case AppState.Profile:
+                return currentUser ? (
+                    <ProfileScreen 
+                        currentUser={currentUser} 
+                        onBack={handleGoHome} 
+                    />
+                ) : (
+                    <LoginScreen onLoginSuccess={handleLoginSuccess} users={mockUsers} />
+                );
             case AppState.Guide:
                 return <GuideScreen onBack={handleGoHome} />;
             case AppState.VocabularyHome:
@@ -339,7 +349,12 @@ const App: React.FC = () => {
                         </button>
                         {currentUser ? (
                             <div className="flex items-center gap-3">
-                                <span className="text-sm font-medium text-slate-600 dark:text-slate-300 hidden sm:inline">Xin chào, <span className="text-blue-600 font-bold">{currentUser.username}</span></span>
+                                <button 
+                                    onClick={() => setAppState(AppState.Profile)}
+                                    className="px-4 py-1.5 text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors border border-slate-300"
+                                >
+                                    Tài khoản
+                                </button>
                                 <button 
                                     onClick={handleLogout}
                                     className="px-4 py-1.5 text-sm font-semibold text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"

@@ -1,3 +1,4 @@
+import { isAccountExpired } from "../services/authUtils";
 import React, { useState } from 'react';
 import SelectionCard from './SelectionCard';
 import { User, TestData } from '../types';
@@ -41,7 +42,7 @@ const GrammarScreen: React.FC<GrammarScreenProps> = ({ currentUser, onSelectTopi
                             title={topic.title}
                             description={topic.description}
                             onClick={() => onSelectTopic(topic.title)}
-                            isLocked={!currentUser && topic.title !== "Danh từ & Cụm danh từ"}
+                            isLocked={(!currentUser || isAccountExpired(currentUser)) && topic.title !== "Danh từ & Cụm danh từ"}
                         />
                     ))}
                 </div>

@@ -1,3 +1,4 @@
+import { isAccountExpired } from "../services/authUtils";
 import React from 'react';
 import { ets2024Tests, ets2026Tests } from '../services/dictationLibrary';
 import { User, DictationMode } from '../types';
@@ -74,7 +75,7 @@ const DictationScreen: React.FC<DictationScreenProps> = ({ currentUser, onSelect
                                 title={test.title}
                                 description={test.description}
                                 onClick={() => onSelectTestSet(test.id)}
-                                isLocked={!currentUser}
+                                isLocked={!currentUser || isAccountExpired(currentUser)}
                             />
                         ))}
                     </div>
