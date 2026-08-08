@@ -21,7 +21,9 @@ import {
     WordPronunciationEvaluationResult
 } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+const ai = new GoogleGenAI({
+  apiKey: import.meta.env.VITE_GOOGLE_API_KEY
+});
 
 const testDataSchema = {
     type: Type.OBJECT,
