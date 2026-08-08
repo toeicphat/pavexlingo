@@ -22,9 +22,10 @@ interface GrammarScreenProps {
     currentUser?: User | null;
     onSelectTopic: (topic: string) => void;
     onStartRandomTest?: (testData: TestData) => void;
+    onBack?: () => void;
 }
 
-const GrammarScreen: React.FC<GrammarScreenProps> = ({ currentUser, onSelectTopic }) => {
+const GrammarScreen: React.FC<GrammarScreenProps> = ({ currentUser, onSelectTopic, onBack }) => {
     return (
         <div className="container mx-auto px-4 py-12">
             <div className="max-w-6xl mx-auto">

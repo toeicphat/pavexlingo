@@ -1,5 +1,8 @@
 import React, { useState, useCallback, useMemo } from 'react';
+import { readingPart5TestData } from './data/readingPart5Data';
 import PracticeHub from './components/PracticeHub';
+import ReadingHub from './components/ReadingHub';
+import StudyScreen from './components/StudyScreen';
 import VocabularyScreen from './components/VocabularyScreen';
 import VocabularyPartScreen from './components/VocabularyPartScreen';
 import VocabularyTestScreen from './components/VocabularyTestScreen';
@@ -27,7 +30,7 @@ const mockUsers: User[] = [
     { username: 'tester', password: '123456', role: 'tester' },
     { username: 'hoangphuctayninh1708@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
     { username: 'tranhuynhlt46@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
-    { username: 'minhchungsuke121@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
+    { username: 'minhchungsuke121@gmail.com', password: 'thidautoeic', created: '2026-01-06', role: 'student' },
     { username: 'tuongvy2020qn@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
     { username: 'nguyenkimkhanh278@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
     { username: 'nmthuw10@gmail.com', password: 'thidautoeic', created: '2026-08-06', role: 'student' },
@@ -169,6 +172,18 @@ const App: React.FC = () => {
         setAppState(AppState.GrammarHub);
     }, []);
 
+    const handleNavigateToReading = useCallback(() => {
+        setAppState(AppState.ReadingHub);
+    }, []);
+
+    const handleNavigateToStudy = useCallback(() => {
+        setAppState(AppState.StudyScreen);
+    }, []);
+
+    const handleStartPart5Test = useCallback(() => {
+        setAppState(AppState.ReadingPart5Test);
+    }, []);
+
     const handleSelectGrammarTopic = useCallback((topic: string) => {
         setSelectedGrammarTopic(topic);
         setAppState(AppState.GrammarTopic);
@@ -226,13 +241,28 @@ const App: React.FC = () => {
         const practiceHubProps = {
             onNavigateToVocabulary: handleNavigateToVocabulary,
             onNavigateToDictation: handleNavigateToDictation,
-            onNavigateToGrammar: handleNavigateToGrammar,
+            onNavigateToReading: handleNavigateToReading,
             onNavigateToListeningIntense: handleNavigateToListeningIntense,
             isLoggedIn: !!currentUser
         };
         switch (appState) {
             case AppState.PracticeHub:
                 return <PracticeHub {...practiceHubProps} />;
+            case AppState.ReadingHub:
+                return <ReadingHub onNavigateToGrammar={handleNavigateToGrammar} onNavigateToStudy={handleNavigateToStudy} onBack={() => setAppState(AppState.PracticeHub)} />;
+            case AppState.StudyScreen:
+                return <StudyScreen onBack={() => setAppState(AppState.ReadingHub)} onStartPart5Test={handleStartPart5Test} />;
+            case AppState.ReadingPart5Test:
+                return (
+                    <TestScreen 
+                        testData={readingPart5TestData} 
+                        userAnswers={{}} 
+                        onSubmit={(answers: UserAnswers) => {
+                            console.log("Part 5 Test Submitted:", answers);
+                            setAppState(AppState.StudyScreen);
+                        }} 
+                    />
+                );
             case AppState.Login:
                 return <LoginScreen onLoginSuccess={handleLoginSuccess} users={mockUsers} />;
             case AppState.Profile:
@@ -286,6 +316,7 @@ const App: React.FC = () => {
                         currentUser={currentUser}
                         onSelectTopic={handleSelectGrammarTopic} 
                         onStartRandomTest={handleStartGrammarRandomTest} 
+                        onBack={() => setAppState(AppState.ReadingHub)}
                     />
                 );
             case AppState.GrammarTopic:

@@ -97,14 +97,20 @@ const TestScreen: React.FC<TestScreenProps> = ({ testData, userAnswers: initialA
         </div>
 
         {/* Right Sidebar */}
-        <div className="mt-8 lg:mt-0 space-y-8">
+        <div className="mt-8 lg:mt-0 space-y-8 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto pl-2 pr-4 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600">
             <div className="bg-white p-6 rounded-lg shadow-lg border">
                 <Timer initialTime={time} onTimeUp={handleTimeUp} />
                 <button 
-                    onClick={() => { if(window.confirm('Are you sure you want to submit your answers?')) onSubmit(answers); }}
+                    onClick={() => { 
+                        const unanswered = testData.questions.length - Object.keys(answers).length;
+                        const msg = unanswered > 0 
+                            ? `Bạn còn ${unanswered} câu chưa làm. Bạn có chắc chắn muốn nộp bài không?` 
+                            : 'Bạn có chắc chắn muốn nộp bài không?';
+                        if(window.confirm(msg)) onSubmit(answers); 
+                    }}
                     className="w-full mt-4 bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition-colors duration-200"
                 >
-                    Submit Test
+                    Nộp bài
                 </button>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-lg border">

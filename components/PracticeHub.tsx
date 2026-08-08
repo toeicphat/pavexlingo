@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { SectionVocabIcon, SectionDictationIcon, SectionGrammarIcon, MoneyEmojiIcon, SparklesIcon, TargetFillIcon, HeadphoneIcon, MegaphoneIcon, XCircleIcon, ListeningIntenseIcon } from './icons';
+import { SectionVocabIcon, SectionDictationIcon, ReadingIcon, MoneyEmojiIcon, SparklesIcon, TargetFillIcon, HeadphoneIcon, MegaphoneIcon, XCircleIcon, ListeningIntenseIcon } from './icons';
 
 interface PracticeHubProps {
   onNavigateToVocabulary: () => void;
   onNavigateToDictation: () => void;
-  onNavigateToGrammar: () => void;
+  onNavigateToReading: () => void;
   onNavigateToListeningIntense: () => void;
   isLoggedIn: boolean;
 }
 
 const announcements = [
-  { date: '08/06/2026', time: '16:00', text: 'Bổ sung chế độ game Word Rain trong giao diện luyện từ vựng' },
+  { date: '08/08/2026', time: '16:00', text: 'Thay đổi giao diện Reading và bộ sung 100 câu chuyên sâu Reading Part 5' },
+  { date: '06/08/2026', time: '16:00', text: 'Bổ sung chế độ game Word Rain trong giao diện luyện từ vựng' },
   { date: '19/07/2026', time: '11:00', text: 'Xuất hiện 2 chế độ game Bubble & Flappy Bird trong mục luyện tập từ vựng. Hãy trải nghiệm!' },
   { date: '28/06/2026', time: '09:00', text: 'Đã thêm tính năng chọn lọc từ vựng muốn học trong 1 bộ & Lưu lại lịch sử luyện tập trong Nghe chuyên sâu' },
   { date: '17/06/2026', time: '09:00', text: 'Đã thêm tính năng nghe "ngẫu nhiên" trong chức năng Nghe chuyên sâu' },
@@ -57,7 +58,7 @@ const PracticeCard: React.FC<{
 const PracticeHub: React.FC<PracticeHubProps> = ({ 
     onNavigateToVocabulary,
     onNavigateToDictation,
-    onNavigateToGrammar,
+    onNavigateToReading,
     onNavigateToListeningIntense,
     isLoggedIn
 }) => {
@@ -157,10 +158,10 @@ const PracticeHub: React.FC<PracticeHubProps> = ({
             iconColor="text-orange-500"
         />
         <PracticeCard 
-            title="Ngữ pháp"
-            description="Ôn luyện các chủ điểm ngữ pháp TOEIC qua bài tập và đánh giá chi tiết."
-            onClick={onNavigateToGrammar}
-            icon={SectionGrammarIcon}
+            title="Reading"
+            description="Luyện tập các kỹ năng và bài tập phần Đọc TOEIC."
+            onClick={onNavigateToReading}
+            icon={ReadingIcon}
             iconColor="text-green-600"
         />
         <PracticeCard 
