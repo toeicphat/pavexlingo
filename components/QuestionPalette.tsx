@@ -8,9 +8,11 @@ interface QuestionPaletteProps {
   currentQuestionIndex: number;
   onQuestionSelect: (index: number) => void;
   markedForReview?: Set<string>;
+  isSubmitted?: boolean;
+  results?: Record<string, boolean>;
 }
 
-const QuestionPalette: React.FC<QuestionPaletteProps> = ({ questions, answers, currentQuestionIndex, onQuestionSelect, markedForReview }) => {
+const QuestionPalette: React.FC<QuestionPaletteProps> = ({ questions, answers, currentQuestionIndex, onQuestionSelect, markedForReview, isSubmitted, results }) => {
   const useIdAsLabel = useMemo(() => {
     if (!questions || questions.length === 0) return false;
     const firstId = questions[0].id;
@@ -36,12 +38,23 @@ const QuestionPalette: React.FC<QuestionPaletteProps> = ({ questions, answers, c
         const label = useIdAsLabel ? q.id : i + 1;
 
         let buttonClasses = 'w-full h-8 flex items-center justify-center rounded-md font-semibold border text-sm transition-colors duration-200 relative ';
-        if (isActive) {
-          buttonClasses += 'bg-blue-500 text-white border-blue-600 ring-2 ring-blue-300';
-        } else if (isAnswered) {
-          buttonClasses += 'bg-slate-700 text-white border-slate-800';
+        if (isSubmitted && results) {
+          if (results[questionId]) {
+            buttonClasses += 'bg-green-500 text-white border-green-600';
+          } else {
+            buttonClasses += 'bg-red-500 text-white border-red-600';
+          }
+          if (isActive) {
+            buttonClasses += ' ring-2 ring-blue-500 ring-offset-1';
+          }
         } else {
-          buttonClasses += 'bg-white text-slate-600 border-slate-300 hover:bg-slate-100';
+          if (isActive) {
+            buttonClasses += 'bg-blue-500 text-white border-blue-600 ring-2 ring-blue-300';
+          } else if (isAnswered) {
+            buttonClasses += 'bg-slate-700 text-white border-slate-800';
+          } else {
+            buttonClasses += 'bg-white text-slate-600 border-slate-300 hover:bg-slate-100';
+          }
         }
 
         return (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 // FIX: Imported missing types for test data and user answers.
 import { TestData, UserAnswers, Question, QuestionOption } from '../types';
 import Timer from './Timer';
@@ -6,6 +6,7 @@ import QuestionPalette from './QuestionPalette';
 import AudioPlayer from './AudioPlayer';
 import AddVocabPopup from './AddVocabPopup';
 import { useWordSelection } from './useWordSelection';
+import { CheckCircleIcon, XCircleIcon } from './icons';
 
 interface TestScreenProps {
   testData: TestData;
@@ -17,16 +18,40 @@ const TestScreen: React.FC<TestScreenProps> = ({ testData, userAnswers: initialA
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<UserAnswers>(initialAnswers);
   const [time, setTime] = useState(testData.duration);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const results = useMemo(() => {
+    if (!isSubmitted) return undefined;
+    const res = {};
+    testData.questions.forEach(q => {
+      res[q.id] = answers[q.id] === q.correctAnswer;
+    });
+    return res;
+  }, [isSubmitted, testData, answers]);
+
   const contentRef = useRef<HTMLDivElement>(null);
   const { selectionPopup, toastMessage, handleMouseUp, handleSaveWord } = useWordSelection(contentRef);
   
   const currentQuestion = testData.questions[currentQuestionIndex];
+  const getOptionClasses = (optionKey: QuestionOption) => {
+    if (!isSubmitted) {
+      return answers[currentQuestion.id] === optionKey ? 'bg-blue-100 border-blue-500 shadow-sm' : 'bg-white border-slate-300 hover:border-blue-400';
+    }
+    const isCorrect = optionKey === currentQuestion.correctAnswer;
+    const isSelected = answers[currentQuestion.id] === optionKey;
+    if (isCorrect) return 'bg-green-100 border-green-500 shadow-sm';
+    if (isSelected && !isCorrect) return 'bg-red-100 border-red-500 shadow-sm';
+    return 'bg-white border-slate-300 opacity-60';
+  };
 
   const handleTimeUp = useCallback(() => {
-    onSubmit(answers);
-  }, [onSubmit, answers]);
+    if (!isSubmitted) {
+      setIsSubmitted(true);
+    }
+  }, [isSubmitted]);
 
   const handleAnswerSelect = (questionId: number | string, option: QuestionOption) => {
+    if (isSubmitted) return;
     setAnswers(prev => ({ ...prev, [questionId]: option }));
   };
 
@@ -81,37 +106,52 @@ const TestScreen: React.FC<TestScreenProps> = ({ testData, userAnswers: initialA
           <div className="space-y-3">
             {(Object.keys(currentQuestion.options) as QuestionOption[]).map(optionKey => (
               currentQuestion.options[optionKey] && (
-                 <label key={optionKey} className={`flex items-center p-4 border rounded-lg cursor-pointer transition-all duration-200 ${answers[currentQuestion.id] === optionKey ? 'bg-blue-100 border-blue-500 shadow-sm' : 'bg-white border-slate-300 hover:border-blue-400'}`}>
-                    <input 
-                        type="radio" 
-                        name={`question-${currentQuestion.id}`} 
-                        className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300"
-                        checked={answers[currentQuestion.id] === optionKey}
-                        onChange={() => handleAnswerSelect(currentQuestion.id, optionKey)}
-                    />
+                 <label key={optionKey} className={`flex items-start p-4 border rounded-lg transition-all duration-200 ${!isSubmitted ? 'cursor-pointer' : ''} ${getOptionClasses(optionKey)}`}>
+                    <div className="flex-shrink-0 mt-1 flex items-center">
+                        {!isSubmitted && (
+                            <input 
+                                type="radio" 
+                                name={`question-${currentQuestion.id}`} 
+                                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300"
+                                checked={answers[currentQuestion.id] === optionKey}
+                                onChange={() => handleAnswerSelect(currentQuestion.id, optionKey)}
+                            />
+                        )}
+                        {isSubmitted && answers[currentQuestion.id] === optionKey && answers[currentQuestion.id] !== currentQuestion.correctAnswer && <XCircleIcon className="h-5 w-5 text-red-600"/>}
+                        {isSubmitted && optionKey === currentQuestion.correctAnswer && <CheckCircleIcon className="h-5 w-5 text-green-600"/>}
+                    </div>
                     <span className="ml-4 text-base text-slate-700"><span className="font-bold">{optionKey}.</span> {currentQuestion.options[optionKey]}</span>
                  </label>
               )
             ))}
           </div>
+          {isSubmitted && currentQuestion.explanation && (
+            <div className="mt-6 bg-slate-50 p-4 rounded-lg border-l-4 border-blue-500">
+                <h5 className="font-bold text-slate-800">Giải thích:</h5>
+                <p className="text-slate-600 mt-2 whitespace-pre-wrap">{currentQuestion.explanation}</p>
+            </div>
+          )}
         </div>
 
         {/* Right Sidebar */}
-        <div className="mt-8 lg:mt-0 space-y-8 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto pl-2 pr-4 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600">
+        <div className="mt-8 lg:mt-0 space-y-8 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:overscroll-contain pl-2 pr-4 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600">
             <div className="bg-white p-6 rounded-lg shadow-lg border">
-                <Timer initialTime={time} onTimeUp={handleTimeUp} />
-                <button 
-                    onClick={() => { 
-                        const unanswered = testData.questions.length - Object.keys(answers).length;
-                        const msg = unanswered > 0 
-                            ? `Bạn còn ${unanswered} câu chưa làm. Bạn có chắc chắn muốn nộp bài không?` 
-                            : 'Bạn có chắc chắn muốn nộp bài không?';
-                        if(window.confirm(msg)) onSubmit(answers); 
-                    }}
-                    className="w-full mt-4 bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition-colors duration-200"
-                >
-                    Nộp bài
-                </button>
+                {!isSubmitted && <Timer initialTime={time} onTimeUp={handleTimeUp} />}
+                {!isSubmitted ? (
+                    <button 
+                        onClick={() => setIsSubmitted(true)}
+                        className="w-full mt-4 bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition-colors duration-200"
+                    >
+                        Nộp bài
+                    </button>
+                ) : (
+                    <button 
+                        onClick={() => onSubmit(answers)}
+                        className="w-full mt-4 bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                    >
+                        Hoàn thành
+                    </button>
+                )}
             </div>
             <div className="bg-white p-6 rounded-lg shadow-lg border">
                 <h3 className="text-lg font-bold mb-4">Question Palette</h3>
@@ -120,6 +160,8 @@ const TestScreen: React.FC<TestScreenProps> = ({ testData, userAnswers: initialA
                     answers={answers} 
                     currentQuestionIndex={currentQuestionIndex}
                     onQuestionSelect={goToQuestion}
+                    isSubmitted={isSubmitted}
+                    results={results}
                 />
                  <div className="flex justify-between mt-6">
                     <button onClick={goToPrev} disabled={currentQuestionIndex === 0} className="px-4 py-2 bg-slate-200 rounded-md font-semibold text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-300">Previous</button>
